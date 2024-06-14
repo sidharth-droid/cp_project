@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.conf.urls.static import static
-
+from django.urls import path
+from . import views
 urlpatterns = [
-    # your url patterns
+    path('api/complains/',views.ComplainsList.as_view(),name='complains-list'),
+    path('api/complains/<int:pk>/',views.ComplaintDetail.as_view(),name='complain-detail'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
