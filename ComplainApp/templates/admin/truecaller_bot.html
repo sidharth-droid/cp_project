@@ -1,0 +1,18 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+    <h2>Truecaller Telegram Bot</h2>
+    <div>
+        <form id="bot-form" method="post" action="{% url 'truecaller-bot' %}">
+            {% csrf_token %}
+            <label for="message">Send Number to Bot:</label>
+            <textarea id="message" name="message" rows="4" cols="50"></textarea>
+            <br><br>
+            <button type="submit">Send Number</button>
+        </form>
+    </div>
+    <hr>
+    <!-- <h3>Telegram Bot Interface:</h3> -->
+    <!-- Embed Telegram Bot using a widget or link -->
+    <!-- <a href="https://t.me/YourBotUsername" target="_blank">Open Bot Chat</a> -->
+{% endblock %}

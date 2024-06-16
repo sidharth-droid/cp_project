@@ -17,6 +17,7 @@ class Complains(models.Model):
     ack_number = models.CharField(max_length=20,primary_key=True)
     mobile_number = models.TextField(help_text="Enter Mobile Numbers")
     name = models.CharField(max_length=255)
+    address = models.TextField(help_text="Enter Address",blank=True)
     email = models.EmailField(blank=True, null=True)
     # fraud_type = MultiSelectField(choices=Fraud_Type_Choices,max_choices=9)
     fraud_type = models.TextField(help_text="Enter Type of Fraud")
@@ -24,6 +25,7 @@ class Complains(models.Model):
     steps_taken = models.TextField(blank=True,null=True)
     images_videos = models.FileField(upload_to='case_files/', blank=True, null=True)
     status = models.CharField(max_length=50, default='Pending')
+    investigating_officer = models.CharField(max_length=255,blank=True,null=True)
 
     def __str__(self):
         return f'{self.ack_number}-{self.name}'

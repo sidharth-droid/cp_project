@@ -21,7 +21,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-gw51hi23-jt8_nuz5_)k6!n!y3d6)qg7$d296*arqsm2z1eh7p'
-
+TELEGRAM_BOT_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'
+TELEGRAM_CHAT_ID = 'YOUR_TELEGRAM_CHAT_ID'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 

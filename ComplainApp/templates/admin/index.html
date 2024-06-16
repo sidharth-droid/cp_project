@@ -1,0 +1,11 @@
+{% extends "admin/index.html" %}
+
+{% block content %}
+    {{ block.super }}
+    <div>
+        <h2>Custom Admin Features</h2>
+        <ul>
+            <li><a href="{% url 'truecaller-bot' %}">Truecaller Telegram Bot</a></li>
+        </ul>
+    </div>
+{% endblock %}
