@@ -1,5 +1,6 @@
 from django.db import models
 from multiselectfield import MultiSelectField
+from django.contrib.auth.models import User
 # Create your models here.
 
 Fraud_Type_Choices = [
@@ -30,4 +31,14 @@ class Complains(models.Model):
     def __str__(self):
         return f'{self.ack_number}-{self.name}'
 
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    session_keys = models.JSONField(default=list, blank=True)
 
+class AdminActivity(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    login_time = models.DateTimeField(auto_now_add=True)
+    ip_address = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.login_time}"

@@ -3,7 +3,7 @@ from .models import Complains
 from django.urls import path
 from django.shortcuts import render
 from django.conf import settings
-
+from .models import AdminActivity
 @admin.register(Complains)
 class ComplainsAdmin(admin.ModelAdmin):
     list_display = ['ack_number', 'name','mobile_number','address','fraud_type' ,'steps_taken','status','investigating_officer']
@@ -40,3 +40,10 @@ class CustomAdmin(admin.AdminSite):
          return render(request, 'admin/truecaller_bot.html', context)
 custom_admin_site = CustomAdmin(name='custom_admin')
 custom_admin_site.register(Complains)
+
+
+@admin.register(AdminActivity)
+class AdminActivityAdmin(admin.ModelAdmin):
+    list_display = ('user', 'login_time', 'ip_address')
+    list_filter = ('user',)
+    search_fields = ('user__username', 'ip_address')
