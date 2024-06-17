@@ -30,27 +30,27 @@ def login(request):
         form = AuthenticationForm()
     return render(request, 'login.html', {'form': form})
 
-def truecaller_bot_view(request):
-    if request.method == "POST":
-        message = request.POST.get("message")
-        if message:
-            bot_token = settings.TELEGRAM_BOT_TOKEN
-            chat_id = settings.TELEGRAM_CHAT_ID  # This should be customized
-            send_message_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+# def truecaller_bot_view(request):
+#     if request.method == "POST":
+#         message = request.POST.get("message")
+#         if message:
+#             bot_token = settings.TELEGRAM_BOT_TOKEN
+#             chat_id = settings.TELEGRAM_CHAT_ID  # This should be customized
+#             send_message_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
 
-            response = requests.post(send_message_url, data={
-                'chat_id': chat_id,
-                'text': message
-            })
+#             response = requests.post(send_message_url, data={
+#                 'chat_id': chat_id,
+#                 'text': message
+#             })
             
-            if response.status_code == 200:
-                # Message sent successfully
-                pass
+#             if response.status_code == 200:
+#                 # Message sent successfully
+#                 pass
 
-        return HttpResponseRedirect(reverse('truecaller-bot'))
+#         return HttpResponseRedirect(reverse('truecaller-bot'))
 
-    context = {
-        'bot_token': settings.TELEGRAM_BOT_TOKEN,
-        'chat_id': settings.TELEGRAM_CHAT_ID,
-    }
-    return render(request, 'admin/truecaller_bot.html', context)
+#     context = {
+#         'bot_token': settings.TELEGRAM_BOT_TOKEN,
+#         'chat_id': settings.TELEGRAM_CHAT_ID,
+#     }
+#     return render(request, 'admin/truecaller_bot.html', context)

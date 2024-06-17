@@ -21,25 +21,25 @@ class ComplainsAdmin(admin.ModelAdmin):
         }),
     )
 
-class CustomAdmin(admin.AdminSite):
-    site_header = "Admin Dashboard"
-    site_title =  "Admin Portal"
-    index_title = "Welcome To Admin Page"
+# class CustomAdmin(admin.AdminSite):
+#     site_header = "Admin Dashboard"
+#     site_title =  "Admin Portal"
+#     index_title = "Welcome To Admin Page"
 
-    def get_urls(self):
-        urls = super().get_urls()
-        custom_urls = [
-            path('truecaller-bot/',self.admin_view(self.truecaller_bot_view),name='truecaller-bot'),
-        ]
-        return custom_urls + urls
-    def truecaller_bot_view(self,request):
-         context = {
-            'bot_token': settings.TELEGRAM_BOT_TOKEN,
-            'chat_id': settings.TELEGRAM_CHAT_ID,  # Example; customize as needed
-        }
-         return render(request, 'admin/truecaller_bot.html', context)
-custom_admin_site = CustomAdmin(name='custom_admin')
-custom_admin_site.register(Complains)
+#     def get_urls(self):
+#         urls = super().get_urls()
+#         custom_urls = [
+#             path('truecaller-bot/',self.admin_view(self.truecaller_bot_view),name='truecaller-bot'),
+#         ]
+#         return custom_urls + urls
+#     def truecaller_bot_view(self,request):
+#          context = {
+#             'bot_token': settings.TELEGRAM_BOT_TOKEN,
+#             'chat_id': settings.TELEGRAM_CHAT_ID,  # Example; customize as needed
+#         }
+#          return render(request, 'admin/truecaller_bot.html', context)
+# custom_admin_site = CustomAdmin(name='custom_admin')
+# custom_admin_site.register(Complains)
 
 
 @admin.register(AdminActivity)

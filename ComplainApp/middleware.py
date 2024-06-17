@@ -33,20 +33,3 @@ class SingleSessionMiddleware:
         return response
 
 
-
-# class UserActivityMiddleware:
-#     def __init__(self, get_response):
-#         self.get_response = get_response
-
-#     def __call__(self, request):
-#         # Comment out or remove this logging logic if using signals.
-#         if request.user.is_authenticated:
-#             ip_address = request.META.get('REMOTE_ADDR', '')
-#             AdminActivity.objects.create(
-#                 user=request.user,
-#                 login_time=timezone.now(),
-#                 ip_address=ip_address
-#             )
-
-#         response = self.get_response(request)
-#         return response
