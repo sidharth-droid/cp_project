@@ -1,0 +1,9 @@
+<!-- {% extends "admin/base_site.html" %} -->
+{% block content %}
+    {% load static %}
+    <h1>Add User</h1>
+    {% admin_modify %}
+    {% block form %}
+        {{ form }}
+    {% endblock %}
+{% endblock %}

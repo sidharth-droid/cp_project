@@ -11,6 +11,8 @@ file_path = 'D:\Documents\sidharth\cp_cell\Exports.xlsx'
 def export_to_excel():
   
     data = Complains.objects.all().values()  
+    for item in data:
+        item['Date']=item['Date'].replace(tzinfo=None)
 
     df = pd.DataFrame(data)
 
@@ -43,9 +45,21 @@ def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
 
+# @receiver(user_logged_in)
+# def log_user_login(sender, request, user, **kwargs):
+#     ip_address = request.META.get('REMOTE_ADDR', '')
+#     AdminActivity.objects.create(
+#         user=user,
+#         login_time=timezone.now(),
+#         ip_address=ip_address
+#     )
 @receiver(user_logged_in)
 def log_user_login(sender, request, user, **kwargs):
-    ip_address = request.META.get('REMOTE_ADDR', '')
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip_address = x_forwarded_for.split(',')[0]  
+    else:
+        ip_address = request.META.get('REMOTE_ADDR', '') 
     AdminActivity.objects.create(
         user=user,
         login_time=timezone.now(),

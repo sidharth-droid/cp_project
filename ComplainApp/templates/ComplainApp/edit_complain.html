@@ -1,0 +1,207 @@
+{% extends 'admin/base.html' %}
+{% block title %}Edit Complain{% endblock %}
+{% block content %}
+    <div class="container">
+        <h2>Edit Complain</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <h4>Attachments</h4>
+            {{ formset.management_form }}
+            {% for form in formset %}
+                <div>
+                    {{ form.as_p }}
+                    {% if form.instance.pk %}
+                        <p>Current file: 
+                            <a href="{{ form.instance.file.url }}" target="_blank">{{ form.instance.file.name }}</a>
+                        </p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Complain - ComplainApp</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: #fff;
+        }
+        .container {
+            margin-top: 50px;
+            max-width: 800px;
+        }
+        .card-panel {
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .btn {
+            width: 100%;
+            border-radius: 25px;
+        }
+        .input-field input[type=text]:focus + label,
+        .input-field textarea:focus + label,
+        .input-field select:focus + label {
+            color: #6a11cb !important;
+        }
+        .input-field input[type=text]:focus,
+        .input-field textarea:focus,
+        .input-field select:focus {
+            border-bottom: 1px solid #6a11cb !important;
+            box-shadow: 0 1px 0 0 #6a11cb !important;
+        }
+        h3 {
+            margin-bottom: 30px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .file-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .file-preview img, .file-preview video, .file-preview object {
+            max-width: 100px;
+            max-height: 100px;
+        }
+        .file-preview object {
+            width: 100px;
+            height: 100px;
+        }
+        .file-preview div {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card-panel white-text">
+            <h3>Edit Complain</h3>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="input-field">
+                    <input type="text" id="id_ack_number" name="ack_number" value="{{ complain.ack_number }}" required>
+                    <label for="id_ack_number">Acknowledgement Number</label>
+                </div>
+                <div class="input-field">
+                    <input type="text" id="id_mobile_number" name="mobile_number" value="{{ complain.mobile_number }}" required>
+                    <label for="id_mobile_number">Mobile Number</label>
+                </div>
+                <div class="input-field">
+                    <input type="text" id="id_name" name="name" value="{{ complain.name }}" required>
+                    <label for="id_name">Name</label>
+                </div>
+                <div class="input-field">
+                    <textarea id="id_address" name="address" class="materialize-textarea">{{ complain.address }}</textarea>
+                    <label for="id_address">Address</label>
+                </div>
+                <div class="input-field">
+                    <input type="text" id="id_title" name="title" value="{{ complain.title }}" required>
+                    <label for="id_title">Complain Title</label>
+                </div>
+                <div class="input-field">
+                    <textarea id="id_description" name="description" class="materialize-textarea">{{ complain.description }}</textarea>
+                    <label for="id_description">Complain Description</label>
+                </div>
+                <div class="input-field">
+                    <select id="id_status" name="status" required>
+                        <option value="" disabled selected>Choose Status</option>
+                        {% for status in complain_statuses %}
+                            <option value="{{ status.0 }}" {% if complain.status == status.0 %}selected{% endif %}>{{ status.1 }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="id_status">Status</label>
+                </div>
+                <div class="input-field">
+                    <select id="id_fraud_type" name="fraud_type" required>
+                        <option value="" disabled selected>Choose Fraud Type</option>
+                        {% for fraud_type in fraud_types %}
+                            <option value="{{ fraud_type.0 }}" {% if complain.fraud_type == fraud_type.0 %}selected{% endif %}>{{ fraud_type.1 }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="id_fraud_type">Fraud Type</label>
+                </div>
+                <div class="file-field input-field">
+                    <div class="btn">
+                        <span>Upload Files</span>
+                        <input type="file" name="files" multiple>
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input class="file-path validate" type="text" placeholder="Upload one or more files">
+                    </div>
+                </div>
+                <div class="file-preview">
+                    {% load complain_filters %}
+                    {% if complain.files %}
+                        <div>
+                            {% if complain.files.url|is_image %}
+                                <img src="{{ complain.files.url }}" alt="Image">
+                            {% elif complain.files.url|is_pdf %}
+                                <object data="{{ complain.files.url }}" type="application/pdf">
+                                    <a href="{{ complain.files.url }}">PDF File</a>
+                                </object>
+                            {% elif complain.files.url|is_video %}
+                                <video controls>
+                                    <source src="{{ complain.files.url }}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            {% else %}
+                                <a href="{{ complain.files.url }}">Download File</a>
+                            {% endif %}
+                            <p>{{ complain.files.name }}</p>
+                        </div>
+                    {% else %}
+                        <p>No files uploaded.</p>
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn waves-effect waves-light blue">Update Complain</button>
+            </form>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            M.updateTextFields();
+            M.FormSelect.init(document.querySelectorAll('select'));
+        });
+    </script>
+</body>
+</html> -->

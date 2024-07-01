@@ -1,0 +1,145 @@
+
+{% extends 'admin/base.html' %}
+{% block title %}Add Complain{% endblock %}
+{% block content %}
+    <div class="container">
+        <h2>Add New Complain</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <h4>Attachments</h4>
+            {{ attachments.management_form }}
+            {% for form in attachments %}
+                <div class="form-group">
+                    {{ form.as_p }}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <!DOCTYPE html>
+<html>
+<head>
+  <title>Add Complain - ComplainApp</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to right, #6a11cb, #2575fc);
+      color: #fff;
+    }
+    .container {
+      margin-top: 50px;
+      max-width: 600px;
+    }
+    .card-panel {
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .btn {
+      width: 100%;
+      border-radius: 25px;
+    }
+    .input-field input[type=text]:focus + label,
+    .input-field textarea:focus + label,
+    .input-field select:focus + label {
+      color: #6a11cb !important;
+    }
+    .input-field input[type=text]:focus,
+    .input-field textarea:focus,
+    .input-field select:focus {
+      border-bottom: 1px solid #6a11cb !important;
+      box-shadow: 0 1px 0 0 #6a11cb !important;
+    }
+    h3 {
+      margin-bottom: 30px;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card-panel white-text">
+      <h3>Add New Complain</h3>
+      <form method="post">
+        {% csrf_token %}
+        <div class="input-field">
+          <input type="text" id="id_ack_number" name="ack_number" required>
+          <label for="id_ack_number">Acknowledgement Number</label>
+        </div>
+        <div class="input-field">
+          <input type="text" id="id_mobile_number" name="mobile_number" required>
+          <label for="id_mobile_number">Mobile Number</label>
+        </div>
+        <div class="input-field">
+          <input type="text" id="id_name" name="name" required>
+          <label for="id_name">Name</label>
+        </div>
+        <div class="input-field">
+          <textarea id="id_address" name="address" class="materialize-textarea"></textarea>
+          <label for="id_address">Address</label>
+        </div>
+        <div class="input-field">
+          <input type="email" id="id_email" name="email">
+          <label for="id_email">Email</label>
+        </div>
+        <div class="input-field">
+          <input type="text" id="id_fraud_type" name="fraud_type" required>
+          <label for="id_fraud_type">Fraud Type</label>
+        </div>
+        <div class="input-field">
+          <textarea id="id_steps_taken" name="steps_taken" class="materialize-textarea"></textarea>
+          <label for="id_steps_taken">Steps Taken</label>
+        </div>
+        <div class="file-field input-field">
+          <div class="btn">
+            <span>Upload</span>
+            <input type="file" id="id_images_videos" name="images_videos">
+          </div>
+          <div class="file-path-wrapper">
+            <input class="file-path validate" type="text" placeholder="Upload images/videos">
+          </div>
+        </div>
+        <div class="input-field">
+          <select id="id_status" name="status" required>
+            <option value="" disabled selected>Choose Status</option>
+            <option value="open">Open</option>
+            <option value="in review">In Review</option>
+            <option value="visit ps">Visit Police Station</option>
+            <option value="in progress">In Progress</option>
+            <option value="closed">Closed (Reach out to Police Station)</option>
+          </select>
+          <label for="id_status">Status</label>
+        </div>
+        <div class="input-field">
+          <input type="text" id="id_investigating_officer" name="investigating_officer">
+          <label for="id_investigating_officer">Investigating Officer</label>
+        </div>
+        <button type="submit" class="btn waves-effect waves-light blue">Submit Complain</button>
+      </form>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      M.updateTextFields();
+      M.FormSelect.init(document.querySelectorAll('select'));
+    });
+  </script>
+</body>
+</html> -->

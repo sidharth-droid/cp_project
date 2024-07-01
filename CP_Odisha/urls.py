@@ -18,10 +18,11 @@ from django.contrib import admin
 from django.urls import path,include
 from django.conf import settings
 from django.conf.urls.static import static
-
+# from ComplainApp.admin import AdminReport
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('ComplainApp/',include('ComplainApp.urls')),
+    # path('admin/reports/',admin.site.admin_view(AdminReport.as_view()),name='admin_reports'),
     # path('/',include("ComplainApp.urls"))
 ]
 if settings.DEBUG:
