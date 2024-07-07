@@ -67,7 +67,7 @@ body{
     width:96%;
     margin: 0 auto;
     /* background: red; */
-    gap: 1.8rem;
+    gap: 2.8rem;
     grid-template-columns: 14rem auto 23rem;;
 }
 a{
@@ -263,9 +263,6 @@ main .insights > div.closed span{
 main .insights > div.today span{
     background: var(--color-success);
 }
-main .insights > div.pending span{
-    background: var(--color-success);
-}
 main .insights > div .middle{
     display: flex;
     align-items: center;
@@ -276,18 +273,7 @@ main .insights h3{
     margin: 1rem 0 0.6rem;
     font-size: 1.2rem;
 }
-/* main .insights button{
-    display: none;
-}
-main .cases:hover .download-btn1 {
-    display: block;
-}
-main .closed:hover .download-btn2 {
-    display: block;
-}
-main .today:hover .download-btn3 {
-    display: block;
-} */
+
 main .insights .progress{
     position: relative;
     width: 92px;
@@ -324,10 +310,6 @@ main .insights .today svg circle{
     stroke-dashoffset: 35;
     stroke-dasharray: 110;
 }
-main .insights .pending svg circle{
-    stroke-dashoffset: 35;
-    stroke-dasharray: 110;
-}
 
 main .insights .progress .number{
     position: absolute;
@@ -358,12 +340,13 @@ main .recent-complains{
 
 main .recent-complains table{
     background: var(--color-white);
-    width: 100%;
+    width: 115%;
     border-radius: var(--card-border-radius);
     padding: var(--card-padding);
     text-align: center;
     box-shadow: var(--box-shadow);
     transition: all 300ms ease;
+    margin-top: 1rem;
 }
 
 main .recent-complains table:hover {
@@ -371,28 +354,55 @@ main .recent-complains table:hover {
 }
 
 main table tbody td{
-    height: 4rem;
+    height: 6rem;
     border-bottom: 1px solid var(--color-light);
     color: var(--color-dark-variant);
-    width: 4.7rem;
+    width: 8.7rem;
 
 }
 
+main table tbody td a:hover {
+    color: rgb(53, 172, 240);
+}
+
+main table tbody td a::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(33, 123, 191, 0.7);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+main table tbody td a {
+    position: relative;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+main table tbody td a img{
+    height: 1.5rem;
+}
+main table tbody td a:hover::after {
+    opacity: 1;
+}
 main table tbody tr:last-child td{
     border: none;
 }
 
 .right{
     margin-top: 1.4rem;
-    margin-bottom: 115rem;
-    background: green;
+    margin-bottom: auto;
 }
 
 .right .top{
     display: flex;
     justify-content: end;
     gap: 2rem;
-    background: gray;
+    /* background: gray; */
 
 }
 
@@ -491,6 +501,7 @@ main table tbody tr:last-child td{
     }
     main .recent-complains table{
         width: 83vw;
+        
 
     }
     main table thead tr th:last-child,main table thead tr th:first-child{

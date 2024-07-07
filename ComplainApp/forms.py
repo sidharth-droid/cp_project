@@ -1,6 +1,9 @@
 from django import forms
 from .models import Complains,Attachment
 from django.forms import inlineformset_factory
+from django.contrib.auth.forms import UserChangeForm, UserCreationForm
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.models import User, Group
 class ComplainsForm(forms.ModelForm):
     mobile_number = forms.CharField(help_text="Enter multiple mobile numbers separated by commas")
     class Meta:
@@ -22,7 +25,7 @@ class AdminLoginForm(forms.Form):
 class ComplainForm(forms.ModelForm):
     class Meta:
         model = Complains
-        fields = ['ack_number','name','mobile_number','email','address','fraud_type','steps_taken','status','investigating_officer']
+        fields = ['ack_number','name','mobile_number','email','address','fraud_type','steps_taken','status','close_date','investigating_officer']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'validate'}),
             'mobile_number': forms.Textarea(attrs={'class': 'materialize-textarea', 'help_text': 'Enter Mobile Numbers'}),
@@ -44,3 +47,36 @@ class AttachmentForm(forms.ModelForm):
 AttachmentFormSet = inlineformset_factory(
     Complains, Attachment, form=AttachmentForm, extra=1, can_delete=True
 )
+
+class CustomUserCreationForm(UserCreationForm):
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = ['username', 'email', 'first_name', 'last_name', 'password1', 'password2', 'is_active']
+
+# Form for User update
+class CustomUserChangeForm(UserChangeForm):
+    password = None  # Disable password field
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'first_name', 'last_name', 'is_active', 'is_staff', 'is_superuser']
+
+# Form for Group creation and update
+class GroupForm(forms.ModelForm):
+    users = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple
+    )
+
+    class Meta:
+        model = Group
+        fields = ['name', 'permissions', 'users']
+
+    def save(self, commit=True):
+        group = super().save(commit=False)
+        if commit:
+            group.save()
+            self.save_m2m()
+            group.user_set.set(self.cleaned_data['users'])
+        return group
+

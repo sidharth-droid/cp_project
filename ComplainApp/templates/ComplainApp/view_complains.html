@@ -28,6 +28,57 @@
                 .complain-btn:hover {
                     background-color: #45a049;
                 }
+                .table-contain{
+                    max-width: fit-content;
+                    max-height: fit-content;}
+                .table-fixed{
+                    overflow-x: scroll;
+                    overflow-y: scroll;
+                    height: fit-content;
+                    max-height: 70vh;
+                }
+                table{
+                    /* min-width: max-content; */
+                    
+                    border-collapse: separate;
+                }
+                table th{
+                    position: sticky;
+                    top: 0px;
+                    background-color: white;
+                    text-align: center;
+                }
+                table td{
+                    text-align: center;
+                }
+                /* .header-search{
+                    display: flex;
+    align-items: center;
+                } */
+                #search-form {
+                    display: flex;
+                    align-items: center;
+                }
+                #search-form .form-group {
+    margin-right: 10px; /* Adjust margin as needed */
+}
+                #search-form input[type="text"] {
+                    padding: 5px;
+                    border: 1px solid #ccc;
+                    border-radius: 5px;
+                }
+
+                #search-form button {
+                    padding: 5px 10px;
+                    background-color: #007bff;
+                    color: #fff;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                }
+
+                #search-form button:hover {
+                    background-color: #0056b3;}
             </style>
         </head>
         
@@ -56,7 +107,7 @@
                             <span class="material-icons-sharp">
                                 person_outline
                             </span>
-                            <h3>Complains</h3>
+                            <h3>Complaints</h3>
                         </a>
                         <a href="#">
                             <span class="material-icons-sharp">
@@ -87,14 +138,26 @@
                     </div>
                 </aside>
                 <main>
-                    <h1>Complains</h1>
+                    <h1>Complaints</h1>
                     <div class="date"><input type="date" id="todaydate" value=""><span id="currentTime"></span></div>
                     
                     <div class="recent-complains">
 
                         <!-- <h2>Recent Complains</h2> -->
+                         <!-- <div class="header-search"> -->
                         <a href="{% url 'add_complain' %}" class="complain-btn">Add New Complain</a>
-
+                        
+                        <!-- </div> -->
+                        
+                        <form id="search-form" method="get" action="{% url 'view_complains' %}">
+                            <div class="form-group">
+                                <label for="search"></label>
+                                <input type="text" id="search" name="search" placeholder="Search by name, phone, etc." value="{{ request.GET.search }}">
+                            </div>
+                            <button type="submit">Search</button>
+                        </form>
+                        <div class="table-contain">
+                            <div class="table-fixed">
                         <table>
                             <thead>
                                 <tr>
@@ -114,6 +177,7 @@
                 
                             </thead>
                             <tbody>
+                                
                                 {% for complain in complains %}
                                 <tr>
                                     <td><a href="{% url 'edit_complain' complain.pk %}">{{ complain.Date }}</a></td>
@@ -138,6 +202,8 @@
                                 
                             </tbody>
                         </table>
+                        </div>
+                        </div>
                     </div>
                 
                     
@@ -163,8 +229,57 @@
                             </div>
                         </div>
                     
-                    
+                                      
+                        <div class="recent-updates">
+                            <form method="GET" action="{% url 'view_complains' %}">
+                                <div class="form-group">
+                                    <label for="start_date">Start Date:</label>
+                                    <input type="date" id="start_date" name="start_date" value="{{request.GET.start_date}}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="end_date">End Date:</label>
+                                    <input type="date" id="end_date" name="end_date" value="{{request.GET.end_date}}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="status">Status:</label>
+                                    <select id="status" name="status">
+                                        <option value="">All</option>
+                                        {% for value, label in status_choices %}
+                                        <option value="{{ value }}" {% if value == selected_status %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    </div>
+                                    <div class="form-group">
+                                    <label for="investigating_officer">Investigating Officer:</label>
+    <select id="investigating_officer" name="investigating_officer">
+        <option value="">All</option>
+        {% for officer in distinct_investigating_officers %}
+        {% if officer is not None%}
+        <option value="{{ officer }}" {% if officer == request.GET.investigating_officer %}selected{% endif %}>{{ officer }}</option>
+        {% endif %}
+        {% endfor %}
+    </select>
+</div>
+    <div class="form-group">
+    <label for="fraud_type">Fraud Type:</label>
+    <select id="fraud_type" name="fraud_type">
+        <option value="">All</option>
+        {% for type in distinct_fraud_types %}
+        <option value="{{ type }}" {% if type == request.GET.fraud_type %}selected{% endif %}>{{ type }}</option>
+        {% endfor %}
+    </select>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">Filter</button>
+                                <button type="reset" onclick="window.location.href='{% url 'view_complains' %}'">Reset</button>
+
+                            </form>
+
+                            
+                        
+                    </div>
                 </div>
+                
             </div>
         
             <script src="{% static 'js/view_complain.js' %}"></script>

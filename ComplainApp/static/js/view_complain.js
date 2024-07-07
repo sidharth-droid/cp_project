@@ -3,7 +3,7 @@ const menu = document.querySelector("#menu-btn");
 const close = document.querySelector("#c-btn");
 const themeToggle = document.querySelector('.theme-toggler');
 const body = document.body;
-const currentTheme = localStorage.getItem('theme');
+// const currentTheme = localStorage.getItem('theme');
 const links = document.querySelectorAll(".sidebar a");
 const currentDate = new Date();
 const year = currentDate.getFullYear();
@@ -22,15 +22,11 @@ if (currentTheme) {
     body.classList.add(currentTheme);
 }
 themeToggle.addEventListener('click', () => {
-    body.classList.toggle('dark-theme');
-    if (body.classList.contains('dark-theme')) {
-        localStorage.setItem('theme', 'dark-theme');
-    } else {
-        localStorage.setItem('theme', '');
-    }
+    document.body.classList.toggle('dark-theme');
+
     themeToggle.querySelector('span:nth-child(1)').classList.toggle('active');
     themeToggle.querySelector('span:nth-child(2)').classList.toggle('active');
-});
+})
 
 
 document.getElementById("todaydate").value = `${year}-${month}-${day}`;

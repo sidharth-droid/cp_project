@@ -18,14 +18,14 @@ class ComplainsAdmin(admin.ModelAdmin):
     list_filter = ['status', 'fraud_type','investigating_officer']
     fieldsets = (
         (None, {
-            'fields': ('ack_number', 'name', 'mobile_number','address','email')
+            'fields': ( 'name', 'mobile_number','address','email')
         }),
         ('Complaint Details', {
             'fields': ('fraud_type', 'steps_taken', 'status','investigating_officer')
         }),
-        ('Files', {
-            'fields': ('images_videos',)
-        }),
+        # ('Files', {
+        #     # 'fields': ('images_videos',)
+        # }),
     )
 @admin.register(FIR)
 class FIRAdmin(admin.ModelAdmin):

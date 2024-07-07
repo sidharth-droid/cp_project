@@ -1,0 +1,21 @@
+{% extends "complainapp/base.html" %}
+{% block content %}
+<h1>{{ user.pk|yesno:"Update User,Create New User" }}</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Save</button>
+</form>
+
+<hr/>
+
+<h2>Change Password</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ password_form.as_p }}
+    <button type="submit" class="btn btn-warning">Change Password</button>
+</form>
+
+<a href="{% url 'user_list' %}" class="btn btn-secondary mt-3">Back to List</a>
+{% endblock %}

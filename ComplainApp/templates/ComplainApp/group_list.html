@@ -1,0 +1,24 @@
+{% extends "complainapp/base.html" %}
+{% block content %}
+<h1>Group List</h1>
+<a href="{% url 'group_create' %}" class="btn btn-primary mb-3">Create New Group</a>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for group in groups %}
+        <tr>
+            <td>{{ group.name }}</td>
+            <td>
+                <a href="{% url 'group_update' group.id %}" class="btn btn-warning btn-sm">Edit</a>
+                <a href="{% url 'group_delete' group.id %}" class="btn btn-danger btn-sm">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

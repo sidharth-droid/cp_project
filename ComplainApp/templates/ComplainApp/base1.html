@@ -1,0 +1,135 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <title>Dashboard</title> -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+</head>
+
+<body>
+    <div class="container">
+        <aside>
+            <div class="top">
+                <div class="logo">
+                    <img src="{% static 'images/logo1.png' %}" alt="Logo">
+                    <h2>Ad<span class="topc">min</span></h2>
+                </div>
+                <div class="close" id="c-btn">
+                    <span class="material-icons-sharp">
+                        close
+                    </span>
+                </div>
+            </div>
+            <div class="sidebar">
+                <a href="{% url 'admin_dashboard' %}" id="dash">
+                    <span class="material-icons-sharp">
+                        grid_view
+                    </span>
+                    <h3>Dashboard</h3>
+                </a>
+                <a href="{% url 'view_complains' %}" id="complain">
+                    <span class="material-icons-sharp">
+                        person_outline
+                    </span>
+                    <h3>Complains</h3>
+                </a>
+                <a href="#">
+                    <span class="material-icons-sharp">
+                        receipt_long
+                    </span>
+                    <h3>FIRs</h3>
+                </a>
+                {% if is_superuser %}
+                <a href="{% url 'login_activity' %}" id="log">
+                    <span class="material-icons-sharp">
+                        manage_accounts
+                    </span>
+                    <h3>Login Activity</h3>
+                </a>
+                <a href="{% url 'user_list' %}" class="{% if  request.resolver_match.url_name == 'user_list' %}active{% endif %}" id="manage" data-active="manage-users">
+                    <span class="material-icons-sharp">
+                        supervisor_account
+                    </span>
+                    <h3>Manage Users</h3>
+                </a>
+                {% endif %}
+                <a href="{% url 'logout' %}">
+                    <span class="material-icons-sharp">
+                        logout
+                    </span>
+                    <h3>Logout</h3>
+                </a>
+            </div>
+        </aside>
+        <main>
+            {% block content %}
+            {% endblock %}
+
+        </main>
+        <div class="right">
+            <div class="top">
+                <button id="menu-btn">
+                    <span class="material-icons-sharp">menu</span>
+                </button>
+                <div class="theme-toggler">
+                    <span class="material-icons-sharp active">light_mode</span>
+                    <span class="material-icons-sharp">dark_mode</span>
+                </div>
+                <div class="profile">
+                    <div class="info">
+                        <p>Welcome, <b>{{username}}</b></p>
+                        <small class="text-muted">{{designation}}</small>
+                    </div>
+                    <div class="profile-photo">
+                        <img src="{% static 'images/profile_image.jpg' %}" alt="Profile Photo">
+                    </div>
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+
+    <script src="{% static 'js/admin_dashboard.js' %}"></script>
+        
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

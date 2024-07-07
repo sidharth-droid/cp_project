@@ -1,6 +1,218 @@
-{% extends "admin/base_site.html" %}
-{% block content %}
-    <h1>Admin Activity List</h1>
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Activity</title>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/login_act.css' %}">
+    <style>
+        .complain-btn {
+            padding: 10px 20px;
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 12px;
+            margin: 11px auto;
+            cursor: pointer;
+            border-radius: 16px;
+        }
+
+        .complain-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <aside>
+            <div class="top">
+                <div class="logo">
+                    <img src="{% static 'images/logo1.png' %}" alt="Logo">
+                    <h2>Ad<span class="topc">min</span></h2>
+                </div>
+                <div class="close" id="c-btn">
+                    <span class="material-icons-sharp">
+                        close
+                    </span>
+                </div>
+            </div>
+            <div class="sidebar">
+                <a href="{% url 'admin_dashboard' %}" >
+                    <span class="material-icons-sharp">
+                        grid_view
+                    </span>
+                    <h3>Dashboard</h3>
+                </a>
+                <a href="{% url 'view_complains' %}">
+                    <span class="material-icons-sharp">
+                        person_outline
+                    </span>
+                    <h3>Complaints</h3>
+                </a>
+                <a href="#">
+                    <span class="material-icons-sharp">
+                        receipt_long
+                    </span>
+                    <h3>FIRs</h3>
+                </a>
+                {% if is_superuser %}
+                <a href="{% url 'login_activity' %}" class="active">
+                    <span class="material-icons-sharp">
+                        manage_accounts
+                    </span>
+                    <h3>Login Activity</h3>
+                </a>
+                <a href="{% url 'user_list' %}">
+                    <span class="material-icons-sharp">
+                        supervisor_account
+                    </span>
+                    <h3>Manage Users</h3>
+                </a>
+                {% endif %}
+                <a href="{% url 'logout' %}">
+                    <span class="material-icons-sharp">
+                        logout
+                    </span>
+                    <h3>Logout</h3>
+                </a>
+            </div>
+        </aside>
+        <main>
+            <h1>Login Activity</h1>
+            <div class="date"><input type="date" id="todaydate" value=""><span id="currentTime"></span></div>
+            
+            <div class="recent-complains">
+
+                <!-- <h2>Recent Complains</h2> -->
+                <!-- <a href="{% url 'add_complain' %}" class="complain-btn">Add New Complain</a> -->
+                <div class="filter-form">
+                    <form method="GET" action="{% url 'login_activity' %}">
+                        <div class="form-group">
+                            <label for="start_date">Start Date:</label>
+                            <input type="date" id="start_date" name="start_date" value="{{request.GET.start_date}}">
+                        </div>
+                        <div class="form-group">
+                            <label for="end_date">End Date:</label>
+                            <input type="date" id="end_date" name="end_date" value="{{request.GET.end_date}}">
+                        </div>
+                       
+                            <div class="form-group">
+                            <label for="user">User:</label>
+                            <select id="user" name="user">
+                            <option value="">All</option>
+                            {% for user_id, username in distinct_users.items %}
+                <option value="{{ user_id }}" {% if user_id|stringformat:"d" == selected_user %}selected{% endif %}>{{ username }}</option>
+                {% endfor %}
+                            </select>
+                            </div>
+
+                        <button type="submit" class="btn btn-primary">Filter</button>
+                        <button type="reset" onclick="window.location.href='{% url 'login_activity' %}'">Reset</button>
+
+                    </form>
+
+                    <form id="search-form" method="get" action="{% url 'login_activity' %}">
+                        <div class="form-group">
+                            <label for="search">Search:</label>
+                            <input type="text" id="search" name="search" placeholder="Search by name, phone, etc." value="{{ request.GET.search }}">
+                        </div>
+                        <button type="submit">Search</button>
+                    </form>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Login Time</th>
+                            <th>IP Address</th>
+                        </tr>
+        
+                    </thead>
+                    <tbody>
+                        
+                        {% for user in adminobj %}
+                        <tr>
+                            <td>{{ user.user }}</td>
+                            <td>{{ user.login_time }}</td>
+                            <td>{{ user.ip_address }}</td>
+                            <td><a href="{% url 'delete_complain' user.pk %}" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Are you sure you want to delete this complain?')"><img src="{% static 'images/delete_icon.png' %}" alt=""></a></td>
+                        </tr>
+                       
+                        {% endfor %}
+                        
+                    </tbody>
+                </table>
+            </div>
+        
+            
+              
+
+        </main>
+        <div class="right">
+            <div class="top">
+                <button id="menu-btn">
+                    <span class="material-icons-sharp">menu</span>
+                </button>
+                <div class="theme-toggler">
+                    <span class="material-icons-sharp active">light_mode</span>
+                    <span class="material-icons-sharp">dark_mode</span>
+                </div>
+                <div class="profile">
+                    <div class="info">
+                        <p>Welcome, <b>Sidharth</b></p>
+                        <small class="text-muted">Admin</small>
+                    </div>
+                    <div class="profile-photo">
+                        <img src="{% static 'images/profile_image.jpg' %}" alt="Profile Photo">
+                    </div>
+                </div>
+            
+            
+        </div>
+    </div>
+
+    <script src="{% static 'js/login_act.js' %}"></script>
+    
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- <h1>Admin Activity List</h1>
     <table>
         <thead>
             <tr>
@@ -10,13 +222,12 @@
             </tr>
         </thead>
         <tbody>
-            {% for activity in result_list %}
+            
             <tr>
                 <td>{{ activity.user }}</td>
                 <td>{{ activity.login_time }}</td>
                 <td>{{ activity.ip_address }}</td>
             </tr>
-            {% endfor %}
+         
         </tbody>
-    </table>
-{% endblock %}
+    </table> -->

@@ -10,6 +10,7 @@ class ComplainsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Complains
         fields = ('ack_number','mobile_number','name','email','fraud_type','steps_taken','status')
+        read_only_fields = ['ack_number']
 
 class LinkSerializer(serializers.ModelSerializer):
     class Meta:

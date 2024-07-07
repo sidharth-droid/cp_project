@@ -8,27 +8,111 @@
     <title>Dashboard</title>
     <style>
         .download-btn {
-            padding: 10px 20px;
-            background-color: #4CAF50; /* Green */
-            border: none;
-            color: white;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 12px;
-            margin: 11px auto;
-            cursor: pointer;
-            border-radius: 16px;
-        }
+    padding: 10px 20px;
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
+    margin: 11px auto;
+    cursor: pointer;
+    border-radius: 16px;
+}
 
-        .download-btn:hover {
-            background-color: #45a049;
-        }
+.filter{
+    padding: 3px 15px;
+    background-color: #2f7ed7; /* Green */
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
+    margin: 11px auto;
+    cursor: pointer;
+    border-radius: 16px;
+}
+.reset{
+    padding: 3px 15px;
+    background-color: #d53550; /* Green */
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
+    margin: 11px auto;
+    cursor: pointer;
+    border-radius: 16px;
+}
+.filter:hover{
+    background-color: #1d23dc;
+}
+.reset:hover{
+    background-color: #f60a25;
+}
+.download-btn:hover {
+    background-color: #45a049;
+}
+
+.in-form label{
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+
+.in-form input[type="date"] {
+    padding: 6px;
+    width: 100%;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+.graph1{
+    margin-top: 5rem;
+}
+.graph1 select {
+    padding: 5px;
+    width: 10%;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #333;
+}
+
+.graph1 label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+.graph1 select option {
+    padding: 8px;
+}
+
+.graph1 select:focus {
+    outline: none;
+    border-color: #007bff; 
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); 
+}
+.right{
+    margin-bottom: 114rem;
+    /* background-color: #1d23dc; */
+    display: inline;
+}
+.top{
+    margin: auto;
+}
+
     </style>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
-    <!-- <script src="{% static 'js/chart.js' %}"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
+    <script src="{% static 'js/theme.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+
 </head>
 
 <body>
@@ -56,7 +140,7 @@
                     <span class="material-icons-sharp">
                         person_outline
                     </span>
-                    <h3>Complains</h3>
+                    <h3>Complaints</h3>
                 </a>
                 <a href="#">
                     <span class="material-icons-sharp">
@@ -94,11 +178,24 @@
                     <span class="material-icons-sharp">analytics</span>
                     <div class="middle">
                         <div class="left">
-                            <h3>Total Cases</h3>
+                            <h3>Registered Cases</h3>
                             <h1>{{ total_cases }} </h1>
                             <button class="download-btn1 download-btn" onclick="downloadData('total_cases')">Download</button>
+                            
                         </div>
                     </div>
+                    <form method="GET" action="{% url 'admin_dashboard' %}" class="in-form">
+                        <div>
+                            <label for="start_date">From:</label>
+                            <input type="date" id="start_date" name="start_date" value="{{ start_date | default:''}}">
+                        </div>
+                        <div>
+                            <label for="end_date">To:</label>
+                            <input type="date" id="end_date" name="end_date" value="{{ end_date | default:''}}">
+                        </div>
+                        <button type="submit" class="filter">Filter</button>
+                        <button type="reset" class="reset" onclick="window.location.href='{% url 'admin_dashboard' %}'">Reset</button>
+                    </form>
                 </div>
                 <div class="closed">
                     <span class="material-icons-sharp">analytics</span>
@@ -107,8 +204,21 @@
                             <h3>Closed Cases</h3>
                             <h1>{{closed_cases}}</h1>
                             <button class="download-btn2 download-btn" onclick="downloadData('closed_cases')">Download</button>
+                            
                         </div>
                     </div>
+                    <form method="GET" action="{% url 'admin_dashboard' %}" class="in-form">
+                        <div>
+                            <label for="start_date">From:</label>
+                            <input type="date" id="start_date" name="start_date" value="{{ start_date | default:''}}">
+                        </div>
+                        <div>
+                            <label for="end_date">To:</label>
+                            <input type="date" id="end_date" name="end_date" value="{{ end_date | default:''}}">
+                        </div>
+                        <button class="filter" type="submit">Filter</button>
+                        <button type="reset" class="reset" onclick="window.location.href='{% url 'admin_dashboard' %}'">Reset</button>
+                    </form>
                 </div>
                 <div class="today">
                     <span class="material-icons-sharp">analytics</span>
@@ -117,15 +227,44 @@
                             <h3>Registered Today</h3>
                             <h1>{{registered_today}}</h1>
                             <button class="download-btn3 download-btn" onclick="downloadData('registered_today')">Download</button>
+                            <h3>Pending Cases</h3>
+                            <h1>{{pending_cases}}</h1>
+                            <button class="download-btn3 download-btn" onclick="downloadData('pending')">Download</button>
+                
                         </div>
+                     
+                  
+                 
+                            
 
+           
                     </div>
                 
                 </div>
+                <!-- <div class="pending">
+                    <span class="material-icons-sharp">analytics</span>
+                    <div class="middle">
+                        <div class="left">
+                            <h3>Pending Cases</h3>
+                            <h1>{{pending_cases}}</h1>
+                            <button class="download-btn3 download-btn" onclick="downloadData('pending')">Download</button>
+                        </div>
+
+                    </div> -->
+                
+                <!-- </div> -->
                 
             </div>
             <div class="graph1">
                 <canvas id="last-week-chart" width="400" height="200"></canvas>
+                <div>
+                    <label for="time_range">Time Range:</label>
+                    <select id="time_range" name="time_range">
+                        <option value="monthly" {% if time_range == 'monthly' %}selected{% endif %}>Monthly</option>
+                        <option value="weekly" {% if time_range == 'weekly' %}selected{% endif %}>Weekly</option>
+                        <option value="yearly" {% if time_range == 'yearly' %}selected{% endif %}>Yearly</option>
+                    </select>
+                </div>
             </div>
             <div class="recent-complains">
                 
@@ -170,29 +309,246 @@
                 </div>
                 <div class="profile">
                     <div class="info">
-                        <p>Welcome, <b>Sidharth</b></p>
-                        <small class="text-muted">Admin</small>
-                    </div>
-                    <div class="profile-photo">
-                        <img src="{% static 'images/profile_image.jpg' %}" alt="Profile Photo">
+                        <p>Welcome, <b>{{username}}</b></p>
+                        <small class="text-muted">{{designation}}</small>
                     </div>
                 </div>
             </div>
-            <div class="recent-updates">
-                <!-- <h2>Recent Updates</h2> -->
-                     
+            
+            <!-- <div class="recent-updates">                     
                     <div class="updates">
                         <canvas id="statusPieChart" width="400" height="200"></canvas>
-                        <!-- <select id="timeRange">
-                            <option value="all">All</option>
-                            <option value="lastYear">Last 1 Year</option>
-                            <option value="lastTwoYears">Last 2 Years</option>
-                            <option value="lastSixMonths">Last 6 Months</option>
-                        </select> -->
-                    </div>
-             
+                    </div> -->
+        </div>
+    </div>
 
-                <!-- <div class="updates">
+    <script src="{% static 'js/admin_dashboard.js' %}"></script>
+    <script>
+        var timePeriod = '{{ time_range }}';
+        var chartData = {{ chart_data|safe }};
+        var ctx = document.getElementById('last-week-chart').getContext('2d');
+        var complaintsChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: 'Complaints Registered',
+                    data: chartData.registered_data,
+                    fill: true,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)', // Red color
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 2,
+                pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 0.4,
+                pointRadius: 5,
+                pointHoverRadius: 8
+                },
+                {
+                label: 'Complaints Closed',
+                data: chartData.closed_data,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)', // Green color
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2,
+                pointBackgroundColor: 'rgba(255, 99, 132, 1)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 0.4,
+                pointRadius: 5,
+                pointHoverRadius: 8
+            }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: timePeriod === 'weekly' ? 'Week' : (timePeriod === 'yearly' ? 'Year' : 'Date'),
+                            color: '#333',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    y: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Cases',
+                            color: '#333',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
+                        beginAtZero:true
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeInOutQuart' 
+                }
+            }
+        });
+        
+        
+
+        var timePeriodDropdown = document.getElementById('time_range');
+timePeriodDropdown.addEventListener('change', function() {
+    var selectedTimePeriod = this.value;
+    window.location.href = '?time_range=' + selectedTimePeriod;
+});
+        function downloadData(dataType) {
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
+        let baseUrl = '/ComplainApp/admin/download/';
+        baseUrl += dataType + '/';
+        const queryParams = {};
+        if (startDate) {
+            queryParams['start_date'] = startDate;
+        }
+        if (endDate) {
+            queryParams['end_date'] = endDate;
+        }
+        const queryString = new URLSearchParams(queryParams).toString();
+        if (queryString) {
+            baseUrl += '?' + queryString;
+        }
+        window.location.href = baseUrl;
+
+}
+
+
+    </script>
+</body>
+
+</html>
+
+
+
+
+
+<!-- var pieChartData = {{ pie_chart_data|safe }};
+        var ctxPie = document.getElementById('statusPieChart').getContext('2d');
+        var customLabels = [
+            'Open',
+            'In Review',
+            'Visit Police Station',
+            'In Progress',
+            'Closed (Reach out to Police Station)'
+        ];
+        var statusPieChart = new Chart(ctxPie, {
+            type: 'pie',
+        data: {
+                labels: customLabels,
+                datasets: [{
+                    data: pieChartData.data,
+                    backgroundColor: [
+                        '#FF6384', // Red
+                        '#36A2EB', // Blue
+                        '#FFCE56', // Yellow
+                        '#4BC0C0', // Teal
+                        '#9966FF', // Purple
+                        '#FF9F40'  // Orange
+                    ],
+                    
+                    borderColor: [
+                        'white',
+                        'white',
+                        'white',
+                        'white',
+                        'white',
+                        'white',
+                        
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                var label = pieChartData.labels[tooltipItem.dataIndex] || '';
+                                var value = pieChartData.data[tooltipItem.dataIndex] || 0;
+                                return label + ': ' + value.toFixed(2) + '%';
+                            }
+                        }
+                    },
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            padding: 10
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Case Status Distribution',
+                        font: {
+                            size: 18,
+                            color: 'black'
+                        }
+                    }
+                }
+            }
+        }); -->
+
+<!-- //     data: {
+    //         labels: pieChartData.labels,
+    //         datasets: [{
+    //             data: pieChartData.data,
+    //             backgroundColor: [
+    //                 'rgba(255, 99, 132, 0.2)',
+    //                 'rgba(54, 162, 235, 0.2)',
+    //                 'rgba(255, 206, 86, 0.2)',
+    //                 'rgba(75, 192, 192, 0.2)',
+    //                 'rgba(153, 102, 255, 0.2)',
+    //                 'rgba(255, 159, 64, 0.2)'
+    //             ],
+    //             borderColor: [
+    //                 'rgba(255, 99, 132, 1)',
+    //                 'rgba(54, 162, 235, 1)',
+    //                 'rgba(255, 206, 86, 1)',
+    //                 'rgba(75, 192, 192, 1)',
+    //                 'rgba(153, 102, 255, 1)',
+    //                 'rgba(255, 159, 64, 1)'
+    //             ],
+    //             borderWidth: 2
+    //         }]
+    //     },
+    //     options: {
+    //         responsive: true
+    //     }
+    // }); -->
+
+<!-- // window.location.href = `http://127.0.0.1:8000/ComplainApp/admin/download/${dataType}`; -->
+
+<!-- //     document.getElementById('timeRange').addEventListener('change', function() {
+    // let selectedRange = this.value;
+    // fetchPieChartData(selectedRange).then(updatedData => {
+    //     statusPieChart.data.labels = updatedData.labels;
+    //     statusPieChart.data.datasets[0].data = updatedData.data;
+    //     statusPieChart.update();
+    // });
+// }); -->
+
+<!-- <div class="updates">
                     <div class="update">
                         <div class="profile-photo">
                             <img src="profile_image.jpg" alt="">
@@ -231,226 +587,6 @@
 
                     <!-- </div> -->
 
-                </div>
+                <!-- </div> -->
 
-            </div>
-            
-        </div>
-    </div>
-
-    <script src="{% static 'js/admin_dashboard.js' %}"></script>
-    <script>
-        var chartData = {{ chart_data|safe }};
-        var ctx = document.getElementById('last-week-chart').getContext('2d');
-        var complaintsChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: chartData.labels,
-                datasets: [{
-                    label: 'Complaints Registered',
-                    data: chartData.data,
-                    // borderColor: 'rgba(75, 192, 192, 1)',
-                    // backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    // borderWidth: 1,
-                    fill: true,
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1,
-                pointBackgroundColor: 'rgba(54, 162, 235, 1)',
-                pointBorderColor: '#fff',
-                pointBorderWidth: 0.4,
-                pointRadius: 5,
-                pointHoverRadius: 8
-                }]
-            },
-            // options: {
-            //     responsive: true,
-            //     scales: {
-            //         y: {
-            //             beginAtZero: true
-            //         }
-            //     }
-            // }
-            options: {
-                responsive: true,
-                plugins: {
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false
-                    }
-                },
-                scales: {
-                    x: {
-                        display: true,
-                        title: {
-                            display: true,
-                            text: 'Date',
-                            color: '#333',
-                            font: {
-                                size: 14,
-                                weight: 'bold'
-                            }
-                        }
-                    },
-                    y: {
-                        display: true,
-                        title: {
-                            display: true,
-                            text: 'Number of Cases',
-                            color: '#333',
-                            font: {
-                                size: 14,
-                                weight: 'bold'
-                            }
-                        },
-                        beginAtZero:true
-                    }
-                },
-                interaction: {
-                    mode: 'nearest',
-                    axis: 'x',
-                    intersect: false
-                },
-                animation: {
-                    duration: 1000,
-                    easing: 'easeInOutQuart' 
-                }
-            }
-        });
-
-
-        // function fetchPieChartData(timeRange) {
-        // return fetch(`http://127.0.0.1:8000/ComplainApp/admin/get_pie_chart_data/${timeRange}/`)
-        // .then(response => response.json())
-        // .then(data => data)
-        // .catch(error => console.error('Error fetching data:', error));
-// }
-        var pieChartData = {{ pie_chart_data|safe }};
-        // let pieChartData = fetchPieChartData('all');
-        var ctxPie = document.getElementById('statusPieChart').getContext('2d');
-        var customLabels = [
-            'Open',
-            'In Review',
-            'Visit Police Station',
-            'In Progress',
-            'Closed (Reach out to Police Station)'
-        ];
-        var statusPieChart = new Chart(ctxPie, {
-            type: 'pie',
-        //     data: {
-        //         labels: pieChartData.labels,
-        //         datasets: [{
-        //             data: pieChartData.data,
-        //             backgroundColor: [
-        //                 'rgba(255, 99, 132, 0.2)',
-        //                 'rgba(54, 162, 235, 0.2)',
-        //                 'rgba(255, 206, 86, 0.2)',
-        //                 'rgba(75, 192, 192, 0.2)',
-        //                 'rgba(153, 102, 255, 0.2)',
-        //                 'rgba(255, 159, 64, 0.2)'
-        //             ],
-        //             borderColor: [
-        //                 'rgba(255, 99, 132, 1)',
-        //                 'rgba(54, 162, 235, 1)',
-        //                 'rgba(255, 206, 86, 1)',
-        //                 'rgba(75, 192, 192, 1)',
-        //                 'rgba(153, 102, 255, 1)',
-        //                 'rgba(255, 159, 64, 1)'
-        //             ],
-        //             borderWidth: 2
-        //         }]
-        //     },
-        //     options: {
-        //         responsive: true
-        //     }
-        // });
-
-        
-        data: {
-                // labels: pieChartData.labels,
-                labels: customLabels,
-                datasets: [{
-                    data: pieChartData.data,
-                    backgroundColor: [
-                        '#FF6384', // Red
-                        '#36A2EB', // Blue
-                        '#FFCE56', // Yellow
-                        '#4BC0C0', // Teal
-                        '#9966FF', // Purple
-                        '#FF9F40'  // Orange
-                    ],
-                    
-                    borderColor: [
-                        'white',
-                        'white',
-                        'white',
-                        'white',
-                        'white',
-                        'white',
-                        // '#36A2EB',
-                        // '#FFCE56',
-                        // '#4BC0C0',
-                        // '#9966FF',
-                        // '#FF9F40'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(tooltipItem) {
-                                var label = pieChartData.labels[tooltipItem.dataIndex] || '';
-                                var value = pieChartData.data[tooltipItem.dataIndex] || 0;
-                                return label + ': ' + value.toFixed(2) + '%';
-                            }
-                        }
-                    },
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            usePointStyle: true,
-                            pointStyle: 'circle',
-                            padding: 10
-                        }
-                    },
-                    title: {
-                        display: true,
-                        text: 'Case Status Distribution',
-                        font: {
-                            size: 18,
-                            color: 'black'
-                        }
-                    }
-                }
-            }
-        });
-
-    //     document.getElementById('timeRange').addEventListener('change', function() {
-    // let selectedRange = this.value;
-    // fetchPieChartData(selectedRange).then(updatedData => {
-    //     statusPieChart.data.labels = updatedData.labels;
-    //     statusPieChart.data.datasets[0].data = updatedData.data;
-    //     statusPieChart.update();
-    // });
-// });
-
-    </script>
-</body>
-
-</html>
-
-
-
-
-
-
-
-
-
-
-
-
-
+            <!-- </div> -->

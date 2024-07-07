@@ -1,6 +1,9 @@
 from django.db import models
 from multiselectfield import MultiSelectField
 from django.contrib.auth.models import User
+import string
+from django.utils.crypto import get_random_string
+from django.utils import timezone
 
 
 Fraud_Type_Choices = [
@@ -28,9 +31,25 @@ class Complains(models.Model):
     # images_videos = models.FileField(upload_to='case_files/', blank=True, null=True)
     status = models.CharField(max_length=50, default='Pending',choices=[('open','Open'),('in review','In Review'),('visit ps','Visit Police Station'),('in progress','In Progress'),('closed','Closed (Reach out to Police Station)')])
     investigating_officer = models.CharField(max_length=255,blank=True,null=True)
+    close_date = models.DateTimeField(blank=True, null=True)
+
 
     def __str__(self):
         return f'{self.ack_number}-{self.name}'
+    def save(self, *args, **kwargs):
+        if not self.ack_number:
+            unique_ack = False
+            while not unique_ack:
+                ack_number = get_random_string(length=20, allowed_chars=string.ascii_uppercase + string.digits)
+                if not Complains.objects.filter(ack_number=ack_number).exists():
+                    unique_ack = True
+                    self.ack_number = ack_number
+        if self.status == 'closed' and self.close_date is None:
+            self.close_date = timezone.now()
+        elif self.status != 'closed' and self.close_date is not None:
+            self.close_date = None
+
+        super(Complains, self).save(*args, **kwargs)
 class FIR(models.Model):
     complain = models.OneToOneField(Complains, on_delete=models.CASCADE, primary_key=True, related_name='fir')
     date = models.DateTimeField()

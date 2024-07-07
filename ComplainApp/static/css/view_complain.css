@@ -161,6 +161,7 @@ aside.sidebar{
 }
 aside h3{
     font-weight: 500;
+    
 
 }
 
@@ -340,7 +341,7 @@ main .recent-complains{
 
 main .recent-complains table{
     background: var(--color-white);
-    width: 130%;
+    width: 115%;
     border-radius: var(--card-border-radius);
     padding: var(--card-padding);
     text-align: center;
@@ -395,7 +396,7 @@ main table tbody tr:last-child td{
 
 .right{
     margin-top: 1.4rem;
-    margin-bottom: auto;
+    /* margin-bottom: 114rem; */
 }
 
 .right .top{
@@ -408,6 +409,17 @@ main table tbody tr:last-child td{
 
 .right .top button{
     display: none;
+}
+.right .top button{
+    display: inline-block;
+    background:transparent;
+    cursor: pointer;
+    color: var(--color-dark);
+    position: absolute;
+    left: 1rem;
+}
+.right .top button span{
+    font-size: 2rem;
 }
 .right .theme-toggler{
     background: var(--color-light);

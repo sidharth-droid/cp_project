@@ -4,9 +4,11 @@ from django.urls import path
 from . import views
 urlpatterns = [
     path('admin/download/<str:data_type>/', views.download_excel, name='download_excel'),
+    # path('admin/get_chart_data/', views.get_chart_data, name='get_chart_data'),
     path('admin/get_pie_chart_data/<str:time_range>/', views.get_pie_chart_data, name='get_pie_chart_data'),
     path('api/complains/',views.ComplainsList.as_view(),name='complains-list'),
-    path('api/complains/<int:pk>/',views.ComplaintDetail.as_view(),name='complain-detail'),
+    path('api/complains/<str:pk>/',views.ComplaintDetail.as_view(),name='complain-detail'),
+    path('api/complains/create/new/',views.ComplainsCreate.as_view(),name='complain-create'),
     path('api/link/<str:url>',views.LinkDetail.as_view(),name='link-detail'),
     path('api/phone/<str:number>',views.PhoneDetail.as_view(),name='phone-detail'),
     path('api/email/<str:email>',views.EmailDetail.as_view(),name='email-detail'),
@@ -16,6 +18,8 @@ urlpatterns = [
 
     path('admin/login/',views.AdminLogin,name='admin_login'),
     path('admin/dashboard/',views.AdminDashboard,name='admin_dashboard'),
+    path('admin/session_invalidated/', views.session_invalidated, name='session_invalidated'),
+
     # path('admin/complains/', views.view_complains, name='view_complains'),
     # path('admin/complains/add/', views.add_complain, name='add_complain'),
     # path('admin/complains/edit/<int:complain_id>/', views.edit_complain, name='edit_complain'),
@@ -23,16 +27,18 @@ urlpatterns = [
     path('admin/report/<int:days>/', views.download_report, name='download_report'),
     path('admin/complains/', views.complain_list_view, name='view_complains'),
     path('admin/complains/add/', views.complain_create_view, name='add_complain'),
-    path('admin/complains/<int:pk>/edit/', views.complain_update_view, name='edit_complain'),
-    path('admin/complains/<int:pk>/delete/', views.complain_delete_view, name='delete_complain'),
-    path('admin/users/', views.user_list, name='user_list'),
-    path('admin/users/add/', views.user_add, name='user_add'),
-    path('admin/users/<int:object_id>/change/', views.user_change, name='user_change'),
-    path('admin/users/<int:object_id>/delete/', views.user_delete, name='user_delete'),
-    path('admin/groups/', views.group_list, name='custom_group_list'),
-    path('admin/groups/add/', views.group_add, name='custom_group_add'),
-    path('admin/groups/<int:object_id>/change/', views.group_change, name='group_change'),
-    path('admin/groups/<int:object_id>/delete/', views.group_delete, name='group_delete'),
+    path('admin/complains/<str:pk>/edit/', views.complain_update_view, name='edit_complain'),
+    path('admin/complains/<str:pk>/delete/', views.complain_delete_view, name='delete_complain'),
+
+    path('admin/users/', views.user_list_view, name='user_list'),
+    path('admin/users/create/', views.user_create_view, name='user_create'),
+    path('admin/users/update/<int:user_id>/', views.user_update_view, name='user_update'),
+    path('admin/users/delete//<int:user_id>', views.user_delete_view, name='user_delete'),
+    path('admin/groups/', views.group_list_view, name='group_list'),
+    path('admin/groups/create/', views.group_create_view, name='group_create'),
+    path('admin/groups/update/<int:group_id>/', views.group_update_view, name='group_update'),
+    path('admin/groups/delete/<int:group_id>/', views.group_delete_view, name='group_delete'),
+
     path('admin/activity/',views.login_activity,name='login_activity'),
     path('admin/logout/',views.logout_handle,name='logout'),
     
