@@ -9,8 +9,11 @@ const currentDate = new Date();
 const year = currentDate.getFullYear();
 const month = String(currentDate.getMonth() + 1).padStart(2, "0");
 const day = String(currentDate.getDate()).padStart(2, "0");
+const tb = document.querySelector(".toggle-btn")
 
-
+tb.addEventListener('click',()=>{
+    side.style.display = 'none'
+})
 menu.addEventListener('click', () => {
     side.style.display = 'block';
 })

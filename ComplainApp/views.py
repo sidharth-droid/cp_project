@@ -194,7 +194,13 @@ def complain_list_view(request):
             Q(investigating_officer__icontains=search_query)
         )
 
-    
+    designation = ""
+    if is_super(request.user):
+        designation = "Admin"
+    elif is_staff(request.user):
+        designation = "Staff"
+    else:
+        designation = "Member"
     context = {
         'complains': complains,
         'is_superuser': request.user.is_superuser,
@@ -203,7 +209,9 @@ def complain_list_view(request):
         'selected_status': status,
         'distinct_investigating_officers': distinct_investigating_officers,
         'distinct_fraud_types': distinct_fraud_types,
-        'search_query': search_query
+        'search_query': search_query,
+        'username':request.user.username,
+        'designation':designation
 
 
     }
