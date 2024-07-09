@@ -56,7 +56,7 @@
                     </span>
                     <h3>Complaints</h3>
                 </a>
-                <a href="#" class="{% if  request.resolver_match.url_name == 'fir' %}active{% endif %}" data-active="manage-fir" id="fir">
+                <a href="{% url 'view_fir' %}" class="{% if  request.resolver_match.url_name == 'view_fir' or request.resolver_match.url_name == 'add_fir' or request.resolver_match.url_name == 'edit_fir' %}active{% endif %}" data-active="manage-fir" id="fir">
                     <span class="material-icons-sharp">
                         receipt_long
                     </span>

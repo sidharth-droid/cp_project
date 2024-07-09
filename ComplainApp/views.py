@@ -27,7 +27,7 @@ from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 import datetime,csv
-from .forms import ComplainForm,AttachmentFormSet,CustomUserChangeForm,GroupForm,CustomUserCreationForm
+from .forms import ComplainForm,AttachmentFormSet,CustomUserChangeForm,GroupForm,CustomUserCreationForm,FIRForm
 import json
 from openpyxl import Workbook
 from io import BytesIO
@@ -335,18 +335,146 @@ def is_staff(user):
     return user.is_staff
 def is_super(user):
     return user.is_superuser
-# @login_required
-# def get_chart_data(request):
-#     time_range = request.GET.get('time_range', 'monthly')
-#     start_date = request.GET.get('start_date')
-#     end_date = request.GET.get('end_date')
 
-#     # Default to current month
-#     if not start_date or not end_date:
-#         start_date = datetime.date.today().replace(day=1).strftime('%Y-%m-%d')
-#         end_date = (datetime.date.today().replace(day=1) + datetime.timedelta(days=32)).replace(day=1).strftime('%Y-%m-%d')
+@login_required
+def fir_list_view(request):
+    firs = FIR.objects.all()
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    if start_date and end_date:
+        start_date = datetime.datetime.strptime(start_date, '%Y-%m-%d')
+        end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d') + timezone.timedelta(days=1)
+        firs = firs.filter(Date__range=[start_date, end_date])
 
-#     chart_data = calculate_chart_data(start_date, end_date)
+    # Filter by status
+    # status = request.GET.get('status')
+    distinct_investigating_officers = Complains.objects.annotate(
+        lower_officer=Lower('investigating_officer')
+    ).values('lower_officer').distinct().values_list('lower_officer', flat=True)
+
+    distinct_fraud_types = Complains.objects.annotate(
+        lower_fraud_type=Lower('fraud_type')
+    ).values('lower_fraud_type').distinct().values_list('lower_fraud_type', flat=True)
+    # if status:
+    #     complains = complains.filter(status=status)
+    #     print(status)
+
+    # Filter by investigating officer
+    investigating_officer = request.GET.get('investigating_officer')
+    if investigating_officer:
+        firs = firs.filter(complain__investigating_officer__icontains=investigating_officer)
+
+    # Filter by fraud type
+    fraud_type = request.GET.get('fraud_type')
+    if fraud_type:
+        firs = firs.filter(complain__fraud_type__icontains=fraud_type)
+    
+    search_query = request.GET.get('search', '')
+
+    if search_query:
+        search_query = search_query.strip()
+        firs = FIR.objects.filter(
+            Q(complain__name__icontains=search_query) |
+            Q(complain__mobile_number__icontains=search_query) |
+            Q(complain__ack_number__icontains=search_query) |
+            Q(complain__fraud_type__icontains=search_query) |
+            Q(complain__investigating_officer__icontains=search_query)|
+            Q(name_of_complainant__icontains=search_query)|
+            Q(name_of_accused__icontains=search_query)|
+            Q(fir_number__icontains=search_query)
+        )
+    firs = firs.order_by('-Date')
+    designation = ""
+    if is_super(request.user):
+        designation = "Admin"
+    elif is_staff(request.user):
+        designation = "Staff"
+    else:
+        designation = "Member"
+    context = {
+        'firs': firs,
+        'is_superuser': request.user.is_superuser,
+        'Complains': Complains,
+        # 'status_choices': Complains._meta.get_field('status').choices,  
+        # 'selected_status': status,
+        'distinct_investigating_officers': distinct_investigating_officers,
+        'distinct_fraud_types': distinct_fraud_types,
+        'search_query': search_query,
+        'username':request.user.username,
+        'designation':designation
+
+
+    }
+    return render(request, 'complainapp/view_fir.html', context)
+@login_required
+def fir_create_view(request):
+    if request.method == 'POST':
+        form = FIRForm(request.POST)
+        if form.is_valid():
+            fir = form.save()
+            messages.success(request,f'FIR {fir.fir_number} has been successfully created for the complain with acknowledgment number {fir.complain.ack_number}.')
+            return redirect('add_fir')
+        # else:
+            # messages.error(request, 'There were some issues with your submission.')
+            
+
+    else:
+        form = FIRForm()
+    designation = ""
+    if is_super(request.user):
+        designation = "Admin"
+    elif is_staff(request.user):
+        designation = "Staff"
+    else:
+        designation = "Member"
+    context = {
+        'form': form,
+        'is_superuser': request.user.is_superuser,
+        'username':request.user.username,
+        'designation':designation
+
+    }
+    return render(request, 'complainapp/add_fir.html', context)
+
+@login_required
+def fir_update_view(request, pk):
+    fir = get_object_or_404(FIR, pk=pk)
+    if request.method == 'POST':
+        form = FIRForm(request.POST, instance=fir)
+        if form.is_valid():
+            form.save()
+            # messages.success(request, f'Your complaint has been successfully updated.')
+            return redirect('view_fir')  # Adjust the success URL as needed
+        else:
+            messages.error(request, 'There were some issues with your submission.')
+
+    else:
+        form = FIRForm(instance=fir)
+    designation = ""
+    if is_super(request.user):
+        designation = "Admin"
+    elif is_staff(request.user):
+        designation = "Staff"
+    else:
+        designation = "Member"
+    context = {
+        'form': form,
+        'is_superuser': request.user.is_superuser,
+        'username':request.user.username,
+        'fir': fir,
+        'designation':designation
+    }
+    return render(request, 'complainapp/edit_fir.html', context)
+
+@login_required
+def fir_delete_view(request, pk):
+    fir = get_object_or_404(FIR, pk=pk)
+    if request.method == 'DELETE':
+        fir.delete()
+        return JsonResponse({'message': 'FIR deleted successfully.'}, status=204)
+    else:
+        return JsonResponse({'error': 'Method not allowed.'}, status=405)
+    
 
 @login_required
 def get_pie_chart_data(request, time_range):
@@ -926,7 +1054,63 @@ def download_report(request, days):
         writer.writerow([complain.Date, complain.ack_number, complain.name, complain.status, complain.fraud_type])
 
     return response
+@login_required
+@user_passes_test(is_staff)
+def download_fir(request):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    investigating_officer = request.GET.get('investigating_officer')
+    fraud_type = request.GET.get('fraud_type')
+    search_query = request.GET.get('search')
+    
+    firs = FIR.objects.all()
 
+    if start_date and end_date:
+        try:
+            start_date_obj = datetime.datetime.strptime(start_date, '%Y-%m-%d').date()
+            end_date_obj = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
+            firs = firs.filter(Date__date__gte=start_date_obj, Date__date__lte=end_date_obj)
+            
+            print("Working")
+        except ValueError:
+            date_filtered_data = FIR.objects.all()
+            print("Not Working")
+        # firs = firs.filter(Date__range=[start_date, end_date])
+    if investigating_officer:
+        firs = firs.filter(complain__investigating_officer__icontains=investigating_officer)
+    if fraud_type:
+        firs = firs.filter(complain__fraud_type__icontains=fraud_type)
+    if search_query:
+        firs = firs.filter(
+            Q(complain__name__icontains=search_query) |
+            Q(complain__mobile_number__icontains=search_query) |
+            Q(complain__ack_number__icontains=search_query) |
+            Q(complain__fraud_type__icontains=search_query) |
+            Q(complain__investigating_officer__icontains=search_query)|
+            Q(name_of_complainant__icontains=search_query)|
+            Q(name_of_accused__icontains=search_query)|
+            Q(fir_number__icontains=search_query)
+        )
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="firs.csv"'
+    writer = csv.writer(response)
+    writer.writerow([
+        'Date', 'FIR Number', 'Date Reported',
+        'Place of Occurrence', 'Distance', 'Direction', 'Date of Dispatch from PS',
+        'Name of Complainant', 'Residence of Complainant', 'Name of Accused',
+        'Residence of Accused', 'Description', 'Section', 'Steps Taken by IO', 'Result of the Case'
+    ])
+
+
+    for fir in firs:
+        writer.writerow([
+            fir.Date, f"'{fir.fir_number}", fir.date_reported,
+            fir.place_of_occurrence, fir.distance, fir.direction, fir.date_of_dispatch_from_ps,
+            fir.name_of_complainant, fir.residence_of_complainant, fir.name_of_accused,
+            fir.residence_of_accused, fir.description, fir.section, fir.steps_taken_by_io, fir.result_of_the_case
+        ])
+    return response
 # def truecaller_bot_view(request):
 #     if request.method == "POST":
 #         message = request.POST.get("message")

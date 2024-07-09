@@ -438,6 +438,7 @@ padding: 8px;
     main table tbody tr td:last-child,main table tbody tr td:first-child{
         display: none;
     }
+    
 }
 
 @media screen and (max-width:768px){

@@ -1,0 +1,100 @@
+{% extends 'complainapp/base1.html' %}
+{% load static %}
+{% block title %}Update FIR{% endblock %}
+{% block name %}{{ username }}{% endblock %}
+{% block desig %}{{ designation }}{% endblock %}
+{% block content %}
+
+<style>
+    form {
+        margin-top: 1rem;
+        background-color: var(--color-white);
+        padding: var(--card-padding);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--box-shadow);
+    }
+    form input[type="text"],
+    form input[type="email"],
+    form input[type="password"],
+    form input[type="checkbox"],
+    form select,
+    form textarea {
+        width: 100%;
+        padding: 0.5rem;
+        margin: 0.8rem 0;
+        border: 1px solid var(--color-dark-variant);
+        border-radius: var(--border-radius-2);
+        box-sizing: border-box;
+        font-size: 1rem; /* Adjust font size for better readability */
+        outline: none; /* Remove default outline */
+    }
+    form input[type="datetime-local"] {
+        width: 100%;
+        padding: 0.5rem;
+        margin: 0.8rem 0;
+        border: 1px solid var(--color-dark-variant);
+        border-radius: var(--border-radius-2);
+        box-sizing: border-box;
+        font-size: 1rem; /* Adjust font size for better readability */
+        outline: none; /* Remove default outline */
+    }
+    form input[type="datetime-local"]:focus,
+    form input[type="text"]:focus,
+    form input[type="email"]:focus,
+    form input[type="password"]:focus,
+    form input[type="checkbox"]:focus,
+    form select:focus,
+    form textarea:focus {
+        border-color: var(--color-primary); /* Highlight border color on focus */
+    }
+    form button {
+        display: block;
+        width: 100%;
+        padding: 0.8rem;
+        background-color: var(--color-primary);
+        color: var(--color-white);
+        border: none;
+        border-radius: var(--border-radius-2);
+        cursor: pointer;
+        font-weight: 700;
+        transition: background-color 0.3s ease;
+        margin-top: 1rem;
+    }
+    form button:hover {
+        background: #e800d1;
+    }
+    ul {
+        margin-bottom: 1rem;
+    }
+    @media screen and (max-width: 768px) {
+        main {
+            margin-top: 8rem;
+            padding: 0 1rem;
+        }
+    }
+    .errorlist {
+        margin: 0;
+        padding: 0;
+        color: red;
+        list-style-type: none;
+        font-size: 0.9rem;
+        font-weight: bold;
+    }
+    .errorlist li {
+        margin-bottom: 0.5rem;
+    }
+</style>
+
+<h1>Edit FIR - {{ fir.fir_number }}</h1>
+<div class="date"><input type="date" id="todaydate" value=""><span id="currentTime"></span></div>
+<div>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Save Changes</button>
+    </form>
+    <hr/>
+    <!-- <a href="{% url 'user_list' %}" class="btn btn-secondary mt-3">Back to List</a> -->
+</div>
+
+{% endblock %}

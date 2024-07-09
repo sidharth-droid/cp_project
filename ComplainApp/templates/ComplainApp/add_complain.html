@@ -4,155 +4,113 @@
 {% block desig%}{{designation}}{% endblock %}
 {% block content %}
 <style>
-/* Form Container */
-.form-container {
-    width: 100%;
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: var(--padding-1);
-    background: var(--color-white);
-    border-radius: var(--border-radius-3);
-    box-shadow: var(--box-shadow);
-}
-
-/* Card Panel */
-.card-panel {
-    padding: var(--padding-1);
-    background: var(--color-background);
-    border-radius: var(--card-border-radius);
-    box-shadow: var(--box-shadow);
-}
-
-/* Typography */
-h2, h4 {
-    font-weight: bold;
-    color: var(--color-dark);
-    text-align: center;
-}
-
-/* Input Fields */
-.input-field {
-    margin-bottom: 1rem;
-}
-
-.input-field input[type="text"],
-.input-field input[type="email"],
-.input-field textarea {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid var(--color-info-light);
-    border-radius: var(--border-radius-2);
-    font-family: "Roboto", sans-serif;
-    font-size: 1rem;
-    color: var(--color-dark);
-    background: var(--color-white);
-}
-
-.input-field textarea.materialize-textarea {
-    height: 100px;
-    resize: vertical;
-}
-
-/* Labels */
-.input-field label {
-    font-size: 0.9rem;
-    color: var(--color-info-dark);
-}
-
-/* Select Dropdown */
-.input-field select {
-    display: block;
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid var(--color-info-light);
-    border-radius: var(--border-radius-2);
-    font-family: "Roboto", sans-serif;
-    font-size: 1rem;
-    color: var(--color-dark);
-    background: var(--color-white);
-}
-
-/* Button */
-.btn-submit {
-    width: 100%;
-    padding: 0.75rem;
-    border: none;
-    border-radius: var(--border-radius-2);
-    background: var(--color-primary);
-    color: var(--color-white);
-    font-size: 1rem;
-    font-family: "Roboto", sans-serif;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-.btn-submit:hover {
-    background: #e800d1;
-}
-
-/* File Upload */
-.file-field .btn {
-    background: var(--color-primary);
-    color: var(--color-white);
-    padding: 0.5rem 1rem;
-    border-radius: var(--border-radius-2);
-    cursor: pointer;
-}
-
-.file-field .file-path-wrapper input {
-    border: 1px solid var(--color-info-light);
-    border-radius: var(--border-radius-2);
-    padding: 0.5rem;
-}
-/* base.css */
-.alert {
-    padding: 0.75rem 1.25rem;
-    margin-bottom: 1rem;
-    border: 1px solid transparent;
-    border-radius: 0.25rem;
+  /* *{
+      appearance: unset;
+  } */
+  form {
+      margin-top: 1rem;
+      background-color: var(--color-white);
+      padding: var(--card-padding);
+      border-radius: var(--card-border-radius);
+      box-shadow: var(--box-shadow);
+  }
+  form input[type="text"],
+  form input[type="email"],
+  form input[type="password"],
+  form input[type="checkbox"],
+  /* form input[type="date"],
+  form input[type="datetime-local"],
+  form input[type="time"], */
+  form select,
+  form textarea {
+      width: 100%;
+      padding: 0.5rem;
+      margin: 0.8rem 0;
+      border-radius: var(--border-radius-2);
+      border: 1px solid var(--color-dark-variant);
+      box-sizing: border-box;
+  }
+  form input[type="datetime-local"] {
+      width: 100%;
+      padding: 0.5rem;
+      margin: 0.8rem 0;
+      border: 1px solid var(--color-dark-variant);
+      border-radius: var(--border-radius-2);
+      box-sizing: border-box;
+      font-size: 1rem; /* Adjust font size for better readability */
+      outline: none;
+  }
+  
+  form button {
+      display: block;
+      width: 100%;
+      padding: 0.8rem;
+      background-color: var(--color-primary);
+      color: var(--color-white);
+      border: none;
+      border-radius: var(--border-radius-2);
+      cursor: pointer;
+      font-weight: 700;
+      transition: background-color 0.3s ease;
+      margin-top: 1rem;
+  }
+  form button:hover {
+      background: #e800d1;
+  }
+  ul {
+      margin-bottom: 1rem;
+  }
+  form textarea#id_mobile_number{
+    height: 2.5rem;
+  }
+  .alert {
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
 }
 
 .alert-success {
-    color: #155724;
-    background-color: #d4edda;
-    border-color: #c3e6cb;
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  margin-top: 1rem;
 }
 
 .alert-danger {
-    color: #721c24;
-    background-color: #f8d7da;
-    border-color: #f5c6cb;
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
 }
 
 .alert-warning {
-    color: #856404;
-    background-color: #fff3cd;
-    border-color: #ffeeba;
+  color: #856404;
+  background-color: #fff3cd;
+  border-color: #ffeeba;
 }
 
 .alert-info {
-    color: #0c5460;
-    background-color: #d1ecf1;
-    border-color: #bee5eb;
+  color: #0c5460;
+  background-color: #d1ecf1;
+  border-color: #bee5eb;
 }
-
-/* Responsive Design */
-@media screen and (max-width: 768px) {
-  main{
-        margin-top: 8rem;
-        padding: 0 1rem;
-
-    }
-    .form-container {
-        width: 90%;
-        margin: 1rem auto;
-        padding: var(--padding-1);
-    }
-
-    .input-field {
-        margin-bottom: 1.2rem;
-    }
-}
+  @media screen and (max-width: 768px) {
+      main {
+          margin-top: 8rem;
+          padding: 0 1rem;
+      }
+  }
+  .errorlist {
+      margin: 0;
+      padding: 0;
+      color: red;
+      list-style-type: none;
+      font-size: 0.9rem;
+      font-weight: bold;
+  }
+  .errorlist li {
+      margin-bottom: 0.5rem;
+  }
 </style>
 <h1>Add New Complaint</h1>
 <div class="date"><input type="date" id="todaydate" value=""><span id="currentTime"></span></div>
@@ -165,96 +123,12 @@ h2, h4 {
                 {% endfor %}
             </div>
         {% endif %}
-  <div class="form-container">
-    <div class="card-panel">
-        <!-- <h2 class="center-align">Add New Complaint</h2> -->
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="form-section">
-                <!-- <div class="input-field">
-                    <input type="text" id="id_ack_number" name="ack_number" required>
-                    <label for="id_ack_number">Acknowledgement Number</label>
-                </div> -->
-                <div class="input-field">
-                    <label for="id_mobile_number">Mobile Number</label>
-                    <input type="text" id="id_mobile_number" name="mobile_number" required>
-                    
-                </div>
-                <div class="input-field">
-                    <label for="id_name">Name</label>
-                    <input type="text" id="id_name" name="name" required>
-                    
-                </div>
-                <div class="input-field">
-                    <label for="id_address">Address</label>
-                    <textarea id="id_address" name="address" class="materialize-textarea"></textarea>
-                </div>
-                <div class="input-field">
-                    <label for="id_email">Email</label>
-                    <input type="email" id="id_email" name="email">
-                </div>
-                <div class="input-field">
-                  <label for="id_description">Fraud Description</label>
-                  <textarea id="id_description" name="description" class="materialize-textarea"></textarea>
-              </div>
-                <div class="input-field">
-                    <label for="id_fraud_type">Fraud Type</label>
-                    <input type="text" id="id_fraud_type" name="fraud_type" required>
-                </div>
-                <div class="input-field">
-                  <label for="id_accused_account_numbers">Accused Account Numbers</label>
-                  <textarea id="id_accused_account_numbers" name="accusedAccountNumbers" class="materialize-textarea"></textarea>
-              </div>
-              <div class="input-field">
-                  <label for="id_accused_suspicious_items">Accused Suspicious Items</label>
-                  <textarea id="id_accused_suspicious_items" name="accusedSuspiciousItem" class="materialize-textarea"></textarea>
-                  
-              </div>
-                <div class="input-field">
-                    <label for="id_steps_taken">Steps Taken</label>
-                    <textarea id="id_steps_taken" name="steps_taken" class="materialize-textarea"></textarea>
-                </div>
-            </div>
-
-            <!-- <h4 class="center-align">Attachments</h4> -->
-            <!-- {{ attachments.management_form }}
-            {% for form in attachments %}
-                <div class="file-field input-field">
-                    <div class="btn">
-                        <span>Upload</span>
-                        <input type="file" id="id_attachments" name="attachments">
-                    </div>
-                    <div class="file-path-wrapper">
-                        <input class="file-path validate" type="text" placeholder="Upload images/videos">
-                    </div>
-                </div> -->
-            <!-- {% endfor %} -->
-
-            <div class="form-section">
-                <div class="input-field">
-                    <label for="id_status">Status</label>
-                    <select id="id_status" name="status" required>
-                        <option value="" disabled selected>Choose Status</option>
-                        <option value="open">Open</option>
-                        <option value="in review">In Review</option>
-                        <option value="visit ps">Visit Police Station</option>
-                        <option value="in progress">In Progress</option>
-                        <option value="closed">Closed (Reach out to Police Station)</option>
-                    </select>
-                </div>
-                <div class="input-field">
-                    <label for="id_investigating_officer">Investigating Officer</label>
-                    <input type="text" id="id_investigating_officer" name="investigating_officer">
-                </div>
-            </div>
-
-            <div class="submit-section">
-                <button type="submit" class="btn btn-submit">Submit Complaint</button>
-            </div>
-        </form>
-    </div>
-</div>
-
+        <form method="post">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn btn-success">Save</button>
+      </form>
+ 
 {% endblock %}
 
 

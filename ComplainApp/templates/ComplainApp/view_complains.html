@@ -34,12 +34,25 @@
     background-color: #f2dede;
     border-color: #ebccd1;
 }
-
+.table-contain{
+    max-width: 80rem;
+}
+@media screen and (max-width:1200px){
+    .table-contain{
+    max-width: 80%;
+}
+.top-nav{
+    width: inherit;
+}
+}
 @media screen and (max-width:768px) {
     .in-form{
         flex-direction: column;
         align-items: flex-start;
         gap: 0;
+    }
+    .top-nav{
+        width: inherit;
     }
     main{
         margin-top: 8rem;
@@ -67,8 +80,11 @@
     .table-fixed td.ack-column {
         width: 80px;
     }
+    .table-contain{
+        max-width: 85%;
+        /* width:auto; */
+    }
     
-
 
     .table-fixed .io,
     .table-fixed .address,

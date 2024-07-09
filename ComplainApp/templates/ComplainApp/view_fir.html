@@ -1,0 +1,282 @@
+{% extends "complainapp/base1.html" %}
+{% load static %}
+{% block title %}FIRs{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/view_complain.css' %}">
+{% endblock %}
+{% block name%}{{username}}{% endblock %}
+{% block desig%}{{designation}}{% endblock %}
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style>
+    .alert-container {
+    position: fixed;
+    top: 6rem;
+    right: 20px;
+    z-index: 1000;
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+.alert-success {
+    color: #3c763d;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+}
+
+.alert-danger {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+}
+.table-contain{
+    max-width: 80rem;
+}
+.df{
+    background-color: #0ab3f1;
+}
+@media screen and (max-width:1200px) {
+    .table-contain{
+        max-width: 80%;
+    }
+}
+@media screen and (max-width:768px) {
+    .in-form{
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0;
+    }
+    main{
+        margin-top: 8rem;
+        padding: 0 1rem;
+
+    }
+    main .recent-complains{
+        position: relative;
+        margin: 3rem 0 0 0;
+        /* width: 100%; */
+        
+    }
+    
+    main .recent-complains table{
+        width: 100%;
+        margin: 0;
+        min-width: 50px;
+    }
+    .table-contain{
+        max-width: 30%;
+    }
+    .table-fixed th, .table-fixed td {
+        font-size: 14px;
+        padding: 10px 12px;
+    }
+
+    .table-fixed td.ack-column {
+        width: 80px;
+    }
+    
+
+
+    .table-fixed .io,
+    .table-fixed .address,
+    .table-fixed .email,
+    .table-fixed .acc-item,
+    .table-fixed .dt,
+    .table-fixed .acc-ac,
+    .table-fixed .desc{
+        display: none;
+    }    
+}
+
+</style>
+<h1>FIRs</h1>
+
+<div class="date"><input type="date" id="todaydate" value=""><span id="currentTime"></span></div>
+<div class="alert-container"></div>
+<div class="recent-complains">
+
+    <div class="header-search">
+    <a href="{% url 'add_fir' %}" class="complain-btn">Add New FIR</a>
+
+    <form method="GET" action="{% url 'view_fir' %}" class="in-form">
+        <div class="form-group">
+            <label for="start_date">Start Date:</label>
+            <input type="date" id="start_date" name="start_date" value="{{request.GET.start_date}}">
+        </div>
+        <div class="form-group">
+            <label for="end_date">End Date:</label>
+            <input type="date" id="end_date" name="end_date" value="{{request.GET.end_date}}">
+        </div>
+        <div class="form-group">
+            <label for="investigating_officer">Investigating Officer:</label>
+            <select id="investigating_officer" name="investigating_officer">
+                <option value="">All</option>
+                {% for officer in distinct_investigating_officers %}
+                {% if officer is not None%}
+                <option value="{{ officer }}" {% if officer == request.GET.investigating_officer %}selected{% endif %}>{{ officer }}</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="fraud_type">Fraud Type:</label>
+            <select id="fraud_type" name="fraud_type">
+                <option value="">All</option>
+                {% for type in distinct_fraud_types %}
+                <option value="{{ type }}" {% if type == request.GET.fraud_type %}selected{% endif %}>{{ type }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="filset">
+        <button type="submit" class="filter">Filter</button>
+        <button type="reset" class="reset" onclick="window.location.href='{% url 'view_fir' %}'">Reset</button></div>
+
+    </form>
+    </div>
+    
+    <form id="search-form" method="get" action="{% url 'view_fir' %}">
+        <div class="form-group">
+            <label for="search"></label>
+            <input type="text" id="search" name="search" placeholder="Search by name, phone, etc."
+                value="{{ request.GET.search }}">
+
+        </div>
+        <button type="submit">Search</button>
+
+    </form>
+    <div>
+        <a href="{% url 'download_fir' %}?{{ request.GET.urlencode }}" class="btn btn-primary df complain-btn">Download FIR</a>
+    </div>
+    <div class="table-contain">
+        <div class="table-fixed">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Acknowledgement</th>
+                        <th>FIR Number</th>
+                        <th>Date Reported</th>
+                        <th>Place of Occurrence</th>
+                        <th>Distance</th>
+                        <th>Direction</th>
+                        <th>Date of Dispatch from PS</th>
+                        <th>Name of Complainant</th>
+                        <th>Residence of Complainant</th>
+                        <th>Name of Accused</th>
+                        <th>Residence of Accused</th>
+                        <th>Description</th>
+                        <th>Section</th>
+                        <th>Steps Taken by IO</th>
+                        <th>Result of the Case</th>
+                        {% if is_superuser %}
+                        <th class="delete">Delete</th>
+                        {% endif %}
+                        <th></th>
+                        
+                        <!-- <th>Attachments</th> -->
+                        <!-- <th>Actions</th> -->
+                    </tr>
+
+                </thead>
+                <tbody>
+
+                    {% for fir in firs %}
+                    <tr>
+                        <td><a href="{% url 'edit_fir' fir.pk %}">{{ fir.Date }}</a></td>
+                        <td><a href="{% url 'edit_fir' fir.pk %}">{{ fir.complain.ack_number }}</a></td>
+                        <td>{{ fir.fir_number }}</td>
+                        <td>{{ fir.date_reported }}</td>
+                        <td>{{ fir.place_of_occurrence }}</td>
+                        <td>{{ fir.distance }}</td>
+                        <td>{{ fir.direction }}</td>
+                        <td>{{ fir.date_of_dispatch_from_ps }}</td>
+                        <td>{{ fir.name_of_complainant }}</td>
+                        <td>{{ fir.residence_of_complainant }}</td>
+                        <td>{{ fir.name_of_accused }}</td>
+                        <td>{{ fir.residence_of_accused }}</td>
+                        <td>{{ fir.description }}</td>
+                        <td>{{ fir.section }}</td>
+                        <td>{{ fir.steps_taken_by_io }}</td>
+                        <td>{{ fir.result_of_the_case }}</td>
+                        {% if is_superuser %}
+                        <td>
+                            
+                            
+                                    <a href="#" class="btn btn-sm btn-danger delete-complain-btn"
+                                    data-url="{% url 'delete_fir' fir.pk %}"
+                                    data-confirm-message="Are you sure you want to delete this FIR?">
+                                    <img src="{% static 'images/delete_icon.png' %}" alt="">
+                                 </a>
+                                </td>
+                                {% endif %}
+                        <td></td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var deleteButtons = document.querySelectorAll('.delete-complain-btn');
+
+        deleteButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                var confirmMessage = button.getAttribute('data-confirm-message');
+                if (confirm(confirmMessage)) {
+                    var url = button.getAttribute('data-url');
+
+                    fetch(url, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                        },
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            // Optional: Update UI or notify user
+                            // window.location.reload();  // Reload the page after successful deletion
+                            var row = button.closest('tr');
+                            row.remove();
+                            showAlert('FIR deleted successfully.', 'success');
+                        } else {
+                            console.error('Error deleting FIR:', response.statusText);
+                            showAlert('Failed to delete the FIR.', 'danger');
+                            // Handle error scenario
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error deleting FIR:', error);
+                        showAlert('Failed to delete the FIR.', 'danger');
+                        // Handle fetch error
+                    });
+                }
+            });
+        });
+    });
+    function showAlert(message, type) {
+            var alertContainer = document.querySelector('.alert-container');
+            var alertElement = document.createElement('div');
+            alertElement.className = 'alert alert-' + type;
+            alertElement.textContent = message;
+
+            alertContainer.appendChild(alertElement);
+
+            // Automatically remove the alert after 3 seconds
+            setTimeout(function() {
+                alertElement.remove();
+            }, 3000);
+        }
+</script>
+{% endblock %}

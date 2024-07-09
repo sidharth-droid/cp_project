@@ -4,6 +4,7 @@ from django.urls import path
 from . import views
 urlpatterns = [
     path('admin/download/<str:data_type>/', views.download_excel, name='download_excel'),
+    path('admin/download_fir/', views.download_fir, name='download_fir'),
     # path('admin/get_chart_data/', views.get_chart_data, name='get_chart_data'),
     path('admin/get_pie_chart_data/<str:time_range>/', views.get_pie_chart_data, name='get_pie_chart_data'),
     path('api/complains/',views.ComplainsList.as_view(),name='complains-list'),
@@ -29,6 +30,11 @@ urlpatterns = [
     path('admin/complains/add/', views.complain_create_view, name='add_complain'),
     path('admin/complains/<str:pk>/edit/', views.complain_update_view, name='edit_complain'),
     path('admin/complains/<str:pk>/delete/', views.complain_delete_view, name='delete_complain'),
+
+    path('admin/fir/', views.fir_list_view, name='view_fir'),
+    path('admin/fir/add/', views.fir_create_view, name='add_fir'),
+    path('admin/fir/<str:pk>/edit/', views.fir_update_view, name='edit_fir'),
+    path('admin/fir/<str:pk>/delete/', views.fir_delete_view, name='delete_fir'),
 
     path('admin/users/', views.user_list_view, name='user_list'),
     path('admin/users/create/', views.user_create_view, name='user_create'),

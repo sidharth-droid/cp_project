@@ -36,7 +36,7 @@ class FIRAdmin(admin.ModelAdmin):
             'fields': ('complain',)
         }),
         ('FIR Information', {
-            'fields': ('date', 'fir_number', 'place_of_occurrence', 'distance', 'direction', 'date_of_dispatch_from_ps')
+            'fields': ( 'fir_number', 'place_of_occurrence', 'distance', 'direction', 'date_of_dispatch_from_ps')
         }),
         ('Complainant Details', {
             'fields': ('name_of_complainant', 'residence_of_complainant')
