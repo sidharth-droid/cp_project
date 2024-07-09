@@ -667,7 +667,7 @@ def AdminDashboard(request):
         designation = "Member"
 
         
-    
+    complains1 = complains.order_by('-Date')
     
     # fraud_types_data = Complains.objects.values('fraud_type').annotate(count=Count('fraud_type'))
     # fraud_types = [{'fraud_type': item['fraud_type'], 'count': item['count']} for item in fraud_types_data]
@@ -677,6 +677,7 @@ def AdminDashboard(request):
         'registered_today':registered_today,
         'pending_cases':pending_cases,
         'complains':complains,
+        'complains1':complains1,
         'chart_data': chart_data,
         'pie_chart_data': pie_chart_data,
         'start_date': start_date,  # Ensure the date is sent back to the template
