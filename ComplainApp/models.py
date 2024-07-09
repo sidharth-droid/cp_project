@@ -24,6 +24,9 @@ class Complains(models.Model):
     name = models.CharField(max_length=255)
     address = models.TextField(help_text="Enter Address",blank=True)
     email = models.EmailField(blank=True, null=True)
+    description = models.TextField(help_text="Enter Fraud Description",blank=True,null=True)
+    accusedAccountNumbers = models.TextField(help_text="Enter Associated Account Numbers",blank=True,null=True)
+    accusedSuspiciousItem = models.TextField(help_text="Enter Items",blank=True,null=True)
     # fraud_type = MultiSelectField(choices=Fraud_Type_Choices,max_choices=9)
     fraud_type = models.TextField(help_text="Enter Type of Fraud")
     # custom_fraud_type = models.CharField(max_length=255, blank=True, null=True)
@@ -84,6 +87,7 @@ class Attachment(models.Model):
         return f'Attachment for {self.complain.ack_number}'
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    email = models.EmailField(blank=True, null=True)
     session_keys = models.JSONField(default=list, blank=True)
 
 class AdminActivity(models.Model):

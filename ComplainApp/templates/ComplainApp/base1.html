@@ -50,13 +50,13 @@
                     </span>
                     <h3>Dashboard</h3>
                 </a>
-                <a href="{% url 'view_complains' %}" class="{% if  request.resolver_match.url_name == 'view_complains' %}active{% endif %}" data-active="manage-complaints" id="complain">
+                <a href="{% url 'view_complains' %}" class="{% if request.resolver_match.url_name == 'view_complains' or request.resolver_match.url_name == 'add_complain' or request.resolver_match.url_name == 'edit_complain' %}active{% endif %}" data-active="manage-complaints" id="complain">
                     <span class="material-icons-sharp">
                         person_outline
                     </span>
-                    <h3>Complains</h3>
+                    <h3>Complaints</h3>
                 </a>
-                <a href="#" class="{% if  request.resolver_match.url_name == 'login_activity' %}active{% endif %}" data-active="manage-fir" id="fir">
+                <a href="#" class="{% if  request.resolver_match.url_name == 'fir' %}active{% endif %}" data-active="manage-fir" id="fir">
                     <span class="material-icons-sharp">
                         receipt_long
                     </span>
@@ -69,14 +69,14 @@
                     </span>
                     <h3>Login Activity</h3>
                 </a>
-                <a href="{% url 'user_list' %}" class="{% if  request.resolver_match.url_name == 'user_list' %}active{% endif %}" id="manage" data-active="manage-users">
+                <a href="{% url 'user_list' %}" class="{% if  request.resolver_match.url_name == 'user_list' or request.resolver_match.url_name == 'user_create' or request.resolver_match.url_name == 'user_update' or request.resolver_match.url_name == 'user_delete'%}active{% endif %}" id="manage" data-active="manage-users">
                     <span class="material-icons-sharp">
                         supervisor_account
                     </span>
                     <h3>Manage Users</h3>
                 </a>
                 {% endif %}
-                <a href="{% url 'logout' %}">
+                <a href="{% url 'logout-admin' %}">
                     <span class="material-icons-sharp">
                         logout
                     </span>

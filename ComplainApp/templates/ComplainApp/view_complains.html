@@ -7,9 +7,84 @@
 {% block name%}{{username}}{% endblock %}
 {% block desig%}{{designation}}{% endblock %}
 {% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style>
+    .alert-container {
+    position: fixed;
+    top: 6rem;
+    right: 20px;
+    z-index: 1000;
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+.alert-success {
+    color: #3c763d;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+}
+
+.alert-danger {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+}
+
+@media screen and (max-width:768px) {
+    .in-form{
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0;
+    }
+    main{
+        margin-top: 8rem;
+        padding: 0 1rem;
+
+    }
+    main .recent-complains{
+        position: relative;
+        margin: 3rem 0 0 0;
+        /* width: 100%; */
+        
+    }
+    
+    main .recent-complains table{
+        width: 100%;
+        margin: 0;
+        min-width: 50px;
+    }
+    
+    .table-fixed th, .table-fixed td {
+        font-size: 14px;
+        padding: 10px 12px;
+    }
+
+    .table-fixed td.ack-column {
+        width: 80px;
+    }
+    
+
+
+    .table-fixed .io,
+    .table-fixed .address,
+    .table-fixed .email,
+    .table-fixed .acc-item,
+    .table-fixed .dt,
+    .table-fixed .acc-ac,
+    .table-fixed .desc{
+        display: none;
+    }    
+}
+</style>
 <h1>Complaints</h1>
 
 <div class="date"><input type="date" id="todaydate" value=""><span id="currentTime"></span></div>
+<div class="alert-container"></div>
 <div class="recent-complains">
 
     <div class="header-search">
@@ -73,16 +148,24 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th>Ack</th>
-                        <th>Name</th>
-                        <th>Mobile</th>
-                        <th>Email</th>
-                        <th>Address</th>
-                        <th>Fraud Type</th>
-                        <th>Steps Taken</th>
-                        <th>Investigating Officer</th>
-                        <th>Status</th>
+                        <th class="dt">Date</th>
+                        <th class="ack-column">Ack</th>
+                        <th class="name">Name</th>
+                        <th class="mobile">Mobile</th>
+                        <th class="fraud-type">Fraud Type</th>
+                        <th class="desc">Description</th>
+                        <th class="acc-ac">Accused Accounts</th>
+                        <th class="acc-item">Accused Suspicious Items</th>
+                        <th class="steps">Steps Taken</th>
+                        <th class="status">Status</th>
+                        <th class="email">Email</th>
+                        <th class="address">Address</th>
+                        <th class="io">Investigating Officer</th>
+                        {% if is_superuser %}
+                        <th class="delete">Delete</th>
+                        {% endif %}
+                        <th></th>
+                        
                         <!-- <th>Attachments</th> -->
                         <!-- <th>Actions</th> -->
                     </tr>
@@ -92,19 +175,33 @@
 
                     {% for complain in complains %}
                     <tr>
-                        <td><a href="{% url 'edit_complain' complain.pk %}">{{ complain.Date }}</a></td>
+                        <td class="dt"><a href="{% url 'edit_complain' complain.pk %}">{{ complain.Date }}</a></td>
                         <td><a href="{% url 'edit_complain' complain.pk %}">{{ complain.pk }}</a></td>
                         <td>{{ complain.name }}</td>
                         <td>{{ complain.mobile_number }}</td>
-                        <td>{{ complain.email }}</td>
-                        <td>{{ complain.address }}</td>
                         <td>{{ complain.fraud_type}}</td>
+                        <td class="desc">{{ complain.description}}</td>
+                        <td class="acc-ac">{{ complain.accusedAccountNumbers}}</td>
+                        <td class="acc-item">{{ complain.accusedSuspiciousItem}}</td>
                         <td>{{ complain.steps_taken }}</td>
-                        <td>{{ complain.investigating_officer }}</td>
                         <td>{{ complain.status }}</td>
-                        <td><a href="{% url 'delete_complain' complain.pk %}" class="btn btn-sm btn-danger"
+                        <td class="email">{{ complain.email }}</td>
+                        <td class="address">{{ complain.address }}</td>
+                        <td class="io">{{ complain.investigating_officer }}</td>
+                        {% if is_superuser %}
+                        <td>
+                            
+                            <!-- <a href="{% url 'delete_complain' complain.pk %}" class="btn btn-sm btn-danger"
                                 onclick="return confirm('Are you sure you want to delete this complain?')"><img
-                                    src="{% static 'images/delete_icon.png' %}" alt=""></a></td>
+                                    src="{% static 'images/delete_icon.png' %}" alt=""></a> -->
+                                    <a href="#" class="btn btn-sm btn-danger delete-complain-btn"
+                                    data-url="{% url 'delete_complain' complain.pk %}"
+                                    data-confirm-message="Are you sure you want to delete this complain?">
+                                    <img src="{% static 'images/delete_icon.png' %}" alt="">
+                                 </a>
+                                </td>
+                                {% endif %}
+                        <td></td>
                     </tr>
                     {% endfor %}
 
@@ -114,5 +211,58 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var deleteButtons = document.querySelectorAll('.delete-complain-btn');
 
+        deleteButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                var confirmMessage = button.getAttribute('data-confirm-message');
+                if (confirm(confirmMessage)) {
+                    var url = button.getAttribute('data-url');
+
+                    fetch(url, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                        },
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            // Optional: Update UI or notify user
+                            // window.location.reload();  // Reload the page after successful deletion
+                            var row = button.closest('tr');
+                            row.remove();
+                            showAlert('Complain deleted successfully.', 'success');
+                        } else {
+                            console.error('Error deleting Complain:', response.statusText);
+                            showAlert('Failed to delete the Complain.', 'danger');
+                            // Handle error scenario
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error deleting Complain:', error);
+                        showAlert('Failed to delete the Complain.', 'danger');
+                        // Handle fetch error
+                    });
+                }
+            });
+        });
+    });
+    function showAlert(message, type) {
+            var alertContainer = document.querySelector('.alert-container');
+            var alertElement = document.createElement('div');
+            alertElement.className = 'alert alert-' + type;
+            alertElement.textContent = message;
+
+            alertContainer.appendChild(alertElement);
+
+            // Automatically remove the alert after 3 seconds
+            setTimeout(function() {
+                alertElement.remove();
+            }, 3000);
+        }
+</script>
 {% endblock %}

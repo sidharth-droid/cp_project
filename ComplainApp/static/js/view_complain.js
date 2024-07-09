@@ -56,8 +56,6 @@ setInterval(updateTime, 1000);
 updateTime();
 
 
-
-
 // themeToggle.addEventListener('click', () => {
 //     document.body.classList.toggle('dark-theme');
 

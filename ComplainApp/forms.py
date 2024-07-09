@@ -25,7 +25,7 @@ class AdminLoginForm(forms.Form):
 class ComplainForm(forms.ModelForm):
     class Meta:
         model = Complains
-        fields = ['ack_number','name','mobile_number','email','address','fraud_type','steps_taken','status','close_date','investigating_officer']
+        fields = ['name','mobile_number','email','address','fraud_type','steps_taken','status','description','accusedAccountNumbers','accusedSuspiciousItem','investigating_officer']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'validate'}),
             'mobile_number': forms.Textarea(attrs={'class': 'materialize-textarea', 'help_text': 'Enter Mobile Numbers'}),
@@ -49,17 +49,35 @@ AttachmentFormSet = inlineformset_factory(
 )
 
 class CustomUserCreationForm(UserCreationForm):
-    class Meta(UserCreationForm.Meta):
+    # class Meta(UserCreationForm.Meta):
+    #     model = User
+    #     fields = ['username', 'email', 'first_name', 'last_name', 'password1', 'password2', 'is_active']
+    email = forms.EmailField(required=False)  # Email is optional
+    is_active = forms.BooleanField(required=False, initial=True, label="Active")
+    is_staff = forms.BooleanField(required=False, initial=False, label="Staff")
+
+
+    class Meta:
         model = User
         fields = ['username', 'email', 'first_name', 'last_name', 'password1', 'password2', 'is_active']
 
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data.get('email', '')  # Handle optional email
+        # user.is_active = self.cleaned_data['is_active']
+        # user.is_staff = self.cleaned_data.get['is_staff']
+        user.is_active = self.cleaned_data.get('is_active', True)
+        user.is_staff = self.cleaned_data.get('is_staff', True)
+        if commit:
+            user.save()
+        return user
 # Form for User update
 class CustomUserChangeForm(UserChangeForm):
     password = None  # Disable password field
     class Meta:
         model = User
         fields = ['username', 'email', 'first_name', 'last_name', 'is_active', 'is_staff', 'is_superuser']
-
+    
 # Form for Group creation and update
 class GroupForm(forms.ModelForm):
     users = forms.ModelMultipleChoiceField(

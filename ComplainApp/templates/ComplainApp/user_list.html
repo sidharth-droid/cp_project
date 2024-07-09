@@ -1,53 +1,203 @@
 {% extends "complainapp/base1.html" %}
-<script>
-    document.addEventListener('DOMContentLoaded',function(){
-        const manage = document.querySelector('#manage');
-        manage.addEventListener('click',function(){
-            let links = document.querySelectorAll('.sidebar a')
-            links.forEach(function(link) {
-            link.classList.remove('active');
-            if (link.getAttribute('data-active') === 'manage-users') {
-                link.classList.add('active');
-            }
-        })
+{% load static %}
+{% block title %}Login Activity{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/view_complain.css' %}">
+{% endblock %}
+{% block name%}{{username}}{% endblock %}
+{% block desig%}{{designation}}{% endblock %}
 
-    })
-
-    
-</script>
 {% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style>
+    .alert-container {
+        position: fixed;
+        top: 6rem;
+        right: 20px;
+        z-index: 1000;
+    }
+
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+    }
+
+    .alert-success {
+        color: #3c763d;
+        background-color: #dff0d8;
+        border-color: #d6e9c6;
+    }
+
+    .alert-danger {
+        color: #a94442;
+        background-color: #f2dede;
+        border-color: #ebccd1;
+    }
+    table{
+        width: 100%;
+    }
+    .table-contain{
+        width: 100%;
+        /* overflow-x:unset; */
+        /* overflow-y: unset; */
+    }
+    .table-fixed{
+        width: 105%;
+        
+    }
+    .user-name-hid{
+        display: none;
+    }
+    @media screen and (max-width:768px){
+        .container{
+        width: 100%;
+        grid-template-columns: 1fr;
+    }
+    
+    main{
+        margin-top: 8rem;
+        padding: 0 1rem;
+
+    }
+    main .recent-complains{
+        position: relative;
+        margin: 3rem 0 0 0;
+        /* width: 100%; */
+        
+    }
+    
+    main .recent-complains table{
+        width: 100%;
+        margin: 0;
+        min-width: 50px;
+    }
+    .table-fixed th, .table-fixed td {
+        font-size: 14px;
+        padding: 10px 12px;
+    }
+    .fn,.ln,.email{
+        display: none;
+    }
+    .user-name-hid{
+        display: block;
+    }
+    
+    }
+    
+</style>
 <h1>User List</h1>
-<a href="{% url 'user_create' %}" class="btn btn-primary mb-3">Create New User</a>
-<a href="{% url 'group_list' %}" class="btn btn-primary mb-3">Group</a>
+<div class="date"><input type="date" id="todaydate" value=""><span id="currentTime"></span></div>
+<div class="alert-container"></div>
+<div class="recent-complains">
 
-<form method="get" class="form-inline mb-3">
-    <input type="text" name="search" class="form-control mr-2" placeholder="Search users" value="{{ request.GET.search }}">
-    <button type="submit" class="btn btn-primary">Search</button>
+    <div class="header-search">
+<a href="{% url 'user_create' %}" class="complain-btn">Create New User</a></div>
+
+<form id="search-form" method="get">
+    <div class="form-group">
+        <label for="search"></label>
+        <input type="text" name="search" id="search" placeholder="Search users" value="{{ request.GET.search }}">
+    </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+
 </form>
-
+<div class="table-contain">
+    <div class="table-fixed">
 <table class="table table-bordered table-striped">
     <thead>
         <tr>
-            <th>Username</th>
-            <th>Email</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Actions</th>
+            <th class="user-name">Username</th>
+            <th class="email">Email</th>
+            <th class="fn">First Name</th>
+            <th class="ln">Last Name</th>
+            <th class="user-name-hid">Username</th>
+            <th class="act">Actions</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
         {% for user in users %}
         <tr>
-            <td>{{ user.username }}</td>
-            <td>{{ user.email }}</td>
-            <td>{{ user.first_name }}</td>
-            <td>{{ user.last_name }}</td>
-            <td>
-                <a href="{% url 'user_update' user.id %}" class="btn btn-warning btn-sm">Edit</a>
-                <a href="{% url 'user_delete' user.id %}" class="btn btn-danger btn-sm">Delete</a>
+            <td class="user-name"><a href="{% url 'user_update' user.id %}">{{ user.username }}</a></td>
+            <td class="email">{{ user.email }}</td>
+            <td class="fn">{{ user.first_name }}</td>
+            <td class="ln">{{ user.last_name }}</td>
+            <td class="user-name-hid"><a href="{% url 'user_update' user.id %}">{{ user.username }}</a></td>
+            <td class="act">
+                <!-- <a href="{% url 'user_delete' user.id %}" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Are you sure you want to delete this user?')"><img
+                                    src="{% static 'images/delete_icon.png' %}" alt=""></a> -->
+                <!-- <a href="{% url 'user_update' user.id %}" class="btn btn-warning btn-sm">Edit</a> -->
+                <!-- <a href="{% url 'user_delete' user.id %}" class="btn btn-danger btn-sm">Delete</a> -->
+                <a href="#" class="btn btn-sm btn-danger delete-user-btn"
+                                    data-url="{% url 'user_delete' user.id %}"
+                                    data-confirm-message="Are you sure you want to delete this User?">
+                                    <img src="{% static 'images/delete_icon.png' %}" alt="">
+                                 </a>
             </td>
+            <td></td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
+</div>
+</div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var deleteButtons = document.querySelectorAll('.delete-user-btn');
+
+        deleteButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                var confirmMessage = button.getAttribute('data-confirm-message');
+                if (confirm(confirmMessage)) {
+                    var url = button.getAttribute('data-url');
+
+                    fetch(url, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                        },
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            // Optional: Update UI or notify user
+                            var row = button.closest('tr');
+                            row.remove();
+                            showAlert('User deleted successfully.', 'success');
+                            // window.location.reload();  // Reload the page after successful deletion
+                        } else {
+                            console.error('Error deleting User:', response.statusText);
+                            showAlert('Failed to delete the User.', 'danger');
+
+                            // Handle error scenario
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error deleting User:', error);
+                        showAlert('Failed to delete the User.', 'danger');
+                        // Handle fetch error
+                    });
+                }
+            });
+        });
+    });
+    function showAlert(message, type) {
+            var alertContainer = document.querySelector('.alert-container');
+            var alertElement = document.createElement('div');
+            alertElement.className = 'alert alert-' + type;
+            alertElement.textContent = message;
+
+            alertContainer.appendChild(alertElement);
+
+            // Automatically remove the alert after 3 seconds
+            setTimeout(function() {
+                alertElement.remove();
+            }, 3000);
+        }
+</script>
 {% endblock %}

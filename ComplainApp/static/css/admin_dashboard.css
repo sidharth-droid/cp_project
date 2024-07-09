@@ -385,14 +385,14 @@ main table tbody tr:last-child td{
 .right{
     margin-top: 1.4rem;
     margin-bottom: 115rem;
-    background: green;
+    /* background: green;   */
 }
 
 .right .top{
     display: flex;
     justify-content: end;
     gap: 2rem;
-    background: gray;
+    /* background: gray; */
 
 }
 

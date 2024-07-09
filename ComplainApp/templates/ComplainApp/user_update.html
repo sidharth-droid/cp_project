@@ -1,7 +1,7 @@
 {% extends 'complainapp/base1.html' %}
-{% block title %}Add User{% endblock %}
-{% block name%}{{username}}{% endblock %}
-{% block desig%}{{designation}}{% endblock %}
+{% block title %}Update User{% endblock %}
+{% block name %}{{ username }}{% endblock %}
+{% block desig %}{{ designation }}{% endblock %}
 {% block content %}
 <style>
     form {
@@ -70,37 +70,27 @@ ul{
         margin-bottom: 0.5rem;
     }
 </style>
-<h1>Add New User</h1>
-<div class="date"><input type="date" id="todaydate" value=""><span id="currentTime"></span></div>
+<h1>Update User</h1>
+<div class="date">
+    <input type="date" id="todaydate" value="">
+    <span id="currentTime"></span>
+</div>
 <div>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-success">Save</button>
-</form>
+        <!-- Additional fields if needed -->
+        <button type="submit" class="btn btn-success">Save Changes</button>
+    </form>
 
-<hr/>
+    <hr/>
+    <form method="post">
+        {% csrf_token %}
+        {{ password_form.as_p }}
 
-
-
-<!-- <a href="{% url 'user_list' %}" class="btn btn-secondary mt-3">Back to List</a> -->
+        <button type="submit" class="btn btn-primary">Change Password</button>
+    </form>
+    <!-- <a href="{% url 'user_list' %}" class="btn btn-secondary mt-3">Back to List</a> -->
+</div>
 {% endblock %}
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- <h2>Change Password</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ password_form.as_p }}
-    <button type="submit" class="btn btn-warning">Change Password</button>
-</form> -->

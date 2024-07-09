@@ -34,13 +34,14 @@ urlpatterns = [
     path('admin/users/create/', views.user_create_view, name='user_create'),
     path('admin/users/update/<int:user_id>/', views.user_update_view, name='user_update'),
     path('admin/users/delete//<int:user_id>', views.user_delete_view, name='user_delete'),
-    path('admin/groups/', views.group_list_view, name='group_list'),
-    path('admin/groups/create/', views.group_create_view, name='group_create'),
-    path('admin/groups/update/<int:group_id>/', views.group_update_view, name='group_update'),
-    path('admin/groups/delete/<int:group_id>/', views.group_delete_view, name='group_delete'),
+    # path('admin/groups/', views.group_list_view, name='group_list'),
+    # path('admin/groups/create/', views.group_create_view, name='group_create'),
+    # path('admin/groups/update/<int:group_id>/', views.group_update_view, name='group_update'),
+    # path('admin/groups/delete/<int:group_id>/', views.group_delete_view, name='group_delete'),
 
     path('admin/activity/',views.login_activity,name='login_activity'),
-    path('admin/logout/',views.logout_handle,name='logout'),
+    path('admin/activity/<int:activity_id>/delete/',views.delete_login_activity,name='delete_login_activity'),
+    path('admin/logout/',views.logout_handle,name='logout-admin'),
     
     
     # path('truecaller-bot/', views.truecaller_bot_view, name='truecaller-bot'),

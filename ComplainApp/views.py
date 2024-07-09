@@ -6,7 +6,7 @@ import requests
 from django.http import HttpResponse,HttpResponseRedirect,JsonResponse
 from django.urls import reverse
 from django.conf import settings
-from django.contrib.auth import login as auth_login,logout,authenticate,update_session_auth_hash
+from django.contrib.auth import login as auth_login,logout,authenticate,update_session_auth_hash,password_validation
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import AuthenticationForm,PasswordChangeForm
 from .utils import invalidate_previous_sessions
@@ -32,7 +32,8 @@ import json
 from openpyxl import Workbook
 from io import BytesIO
 from django.db.models.functions import TruncMonth,TruncYear,TruncWeek,Lower
-
+from django import forms
+from django.utils.translation import gettext as _
 def session_invalidated(request):
     if request.user.is_authenticated:
         logout(request)
@@ -193,7 +194,7 @@ def complain_list_view(request):
             Q(fraud_type__icontains=search_query) |
             Q(investigating_officer__icontains=search_query)
         )
-
+    complains = complains.order_by('-Date')
     designation = ""
     if is_super(request.user):
         designation = "Admin"
@@ -243,18 +244,36 @@ def complain_list_view(request):
 def complain_create_view(request):
     if request.method == 'POST':
         form = ComplainForm(request.POST)
-        attachments = AttachmentFormSet(request.POST, request.FILES)
-        if form.is_valid() and attachments.is_valid():
+        # attachments = AttachmentFormSet(request.POST, request.FILES)
+        # if form.is_valid() and attachments.is_valid():
+        if form.is_valid():
             complain = form.save()
-            attachments.instance = complain
-            attachments.save()
-            return redirect('add_complain')  # Adjust the success URL as needed
+            # attachments.instance = complain
+            # attachments.save()
+            messages.success(request, f'Your complaint has been successfully submitted. Your acknowledgment number is {complain.ack_number}.')
+            return redirect('add_complain')
+        else:
+            # print("Form is not valid. Errors:", form.errors)
+            messages.error(request, 'There were some issues with your submission.')
+
     else:
         form = ComplainForm()
-        attachments = AttachmentFormSet()
+        # attachments = AttachmentFormSet()
+    designation = ""
+    if is_super(request.user):
+        designation = "Admin"
+    elif is_staff(request.user):
+        designation = "Staff"
+    else:
+        designation = "Member"
     context = {
         'form': form,
-        'attachments': attachments,
+        # 'errors':form.errors,
+        # 'attachments': attachments,
+        'is_superuser': request.user.is_superuser,
+        'username':request.user.username,
+        'designation':designation
+
     }
     return render(request, 'complainapp/add_complain.html', context)
 
@@ -270,11 +289,26 @@ def complain_update_view(request, pk):
         form = ComplainForm(request.POST, instance=complain)
         if form.is_valid():
             form.save()
+            # messages.success(request, f'Your complaint has been successfully updated.')
             return redirect('view_complains')  # Adjust the success URL as needed
+        else:
+            messages.error(request, 'There were some issues with your submission.')
+
     else:
         form = ComplainForm(instance=complain)
+    designation = ""
+    if is_super(request.user):
+        designation = "Admin"
+    elif is_staff(request.user):
+        designation = "Staff"
+    else:
+        designation = "Member"
     context = {
         'form': form,
+        'is_superuser': request.user.is_superuser,
+        'username':request.user.username,
+        'complaint': complain,
+        'designation':designation
     }
     return render(request, 'complainapp/edit_complain.html', context)
 
@@ -285,13 +319,18 @@ def complain_update_view(request, pk):
 @login_required
 def complain_delete_view(request, pk):
     complain = get_object_or_404(Complains, pk=pk)
-    if request.method == 'POST':
+    if request.method == 'DELETE':
         complain.delete()
-        return redirect('view_complains')  # Adjust the success URL as needed
-    context = {
-        'complains': complain,
-    }
-    return render(request, 'complainapp/delete_complain.html', context)
+        return JsonResponse({'message': 'Complain deleted successfully.'}, status=204)
+    else:
+        return JsonResponse({'error': 'Method not allowed.'}, status=405)
+    # if request.method == 'POST':
+    #     complain.delete()
+    #     return redirect('view_complains')  # Adjust the success URL as needed
+    # context = {
+    #     'complains': complain,
+    # }
+    # return render(request, 'complainapp/delete_complain.html', context)
 def is_staff(user):
     return user.is_staff
 def is_super(user):
@@ -583,7 +622,15 @@ def user_list_view(request):
         )
     else:
         users = User.objects.all()
-    return render(request, 'complainapp/user_list.html', {'users': users,'is_superuser': request.user.is_superuser})
+    designation = ""
+    if is_super(request.user):
+        designation = "Admin"
+    elif is_staff(request.user):
+        designation = "Staff"
+    else:
+        designation = "Member"
+    return render(request, 'complainapp/user_list.html', {'users': users,'is_superuser': request.user.is_superuser,'username':request.user.username,
+        'designation': designation})
 # View to create user
 @login_required
 @permission_required('auth.add_user', raise_exception=True)
@@ -592,12 +639,20 @@ def user_create_view(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            Profile.objects.create(user=user)
+            # Profile.objects.create(user=user)
 
             return redirect('user_list')
     else:
         form = CustomUserCreationForm()
-    return render(request, 'complainapp/user_form.html', {'form': form})
+    designation = ""
+    if is_super(request.user):
+        designation = "Admin"
+    elif is_staff(request.user):
+        designation = "Staff"
+    else:
+        designation = "Member"
+    return render(request, 'complainapp/user_form.html', {'form': form,'is_superuser': request.user.is_superuser,'username':request.user.username,
+        'designation': designation})
 
 # View to update user
 @login_required
@@ -606,33 +661,91 @@ def user_update_view(request, user_id):
     user = get_object_or_404(User, pk=user_id)
     if request.method == 'POST':
         form = CustomUserChangeForm(request.POST, instance=user)
-        password_form = PasswordChangeForm(user, request.POST)
+        password_form = CustomPasswordChangeForm(user, request.POST)
 
-        if form.is_valid() and password_form.is_valid():
+        if form.is_valid():
             form.save()
-            password_form.save()
+            messages.success(request, 'User information updated successfully.')
+            return redirect('user_list')
+        if password_form.is_valid():
+            user = password_form.save()
             update_session_auth_hash(request, user)  # Keeps user logged in after password change
-            messages.success(request, 'User information and password updated successfully.')
+            messages.success(request, 'Password updated successfully.')
             return redirect('user_list')
     else:
         form = CustomUserChangeForm(instance=user)
-        password_form = PasswordChangeForm(user)
-
-    return render(request, 'complainapp/user_form.html', {
+        password_form = CustomPasswordChangeForm(user)
+    designation = ""
+    if is_super(request.user):
+        designation = "Admin"
+    elif is_staff(request.user):
+        designation = "Staff"
+    else:
+        designation = "Member"
+    return render(request, 'complainapp/user_update.html', {
         'form': form,
         'password_form': password_form,
-        'user': user
+        'user': user,'is_superuser': request.user.is_superuser,
+        'username':request.user.username,
+        'designation': designation
     })
 
+class CustomPasswordChangeForm(PasswordChangeForm):
+    error_messages = {
+        'password_incorrect': _("Your old password was entered incorrectly. Please enter it again."),
+        'password_mismatch': _("The two password fields didn't match."),
+    }
+
+    old_password = forms.CharField(
+        label=_("Old password"),
+        strip=False,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'current-password', 'autofocus': True}),
+    )
+    new_password1 = forms.CharField(
+        label=_("New password"),
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password', 'placeholder': 'Password'}),
+        strip=False,
+        help_text=password_validation.password_validators_help_text_html(),
+    )
+    new_password2 = forms.CharField(
+        label=_("New password confirmation"),
+        strip=False,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password', 'placeholder': 'Confirm Password'}),
+    )
+
+    def clean_old_password(self):
+        old_password = self.cleaned_data.get('old_password')
+        if not self.user.check_password(old_password):
+            raise forms.ValidationError(
+                self.error_messages['password_incorrect'],
+                code='password_incorrect',
+            )
+        return old_password
+
+    def clean_new_password2(self):
+        new_password1 = self.cleaned_data.get('new_password1')
+        new_password2 = self.cleaned_data.get('new_password2')
+        if new_password1 and new_password2:
+            if new_password1 != new_password2:
+                raise forms.ValidationError(
+                    self.error_messages['password_mismatch'],
+                    code='password_mismatch',
+                )
+        return new_password2
 # View to delete user
 @login_required
 @permission_required('auth.delete_user', raise_exception=True)
 def user_delete_view(request, user_id):
     user = get_object_or_404(User, pk=user_id)
-    if request.method == 'POST':
+    # if request.method == 'POST':
+    #     user.delete()
+    #     return redirect('user_list')
+    # return render(request, 'complainapp/user_confirm_delete.html', {'user': user})
+    if request.method == 'DELETE':
         user.delete()
-        return redirect('user_list')
-    return render(request, 'complainapp/user_confirm_delete.html', {'user': user})
+        return JsonResponse({'message': 'User deleted successfully.'}, status=204)
+    else:
+        return JsonResponse({'error': 'Method not allowed.'}, status=405)
 
 # View to list groups
 @login_required
@@ -704,12 +817,22 @@ def login_activity(request):
         adminobj = AdminActivity.objects.filter(
             Q(user__username__icontains=search_query) |
             Q(ip_address__icontains=search_query))
+    adminobj = adminobj.order_by('-login_time')
+    designation = ""
+    if is_super(request.user):
+        designation = "Admin"
+    elif is_staff(request.user):
+        designation = "Staff"
+    else:
+        designation = "Member"
     context = {
         'adminobj':adminobj,
         'is_superuser': request.user.is_superuser,
         'distinct_users':user_dict,
         'selected_user': user_id,
-        'search_query':search_query
+        'search_query':search_query,
+        'username':request.user.username,
+        'designation': designation
 
     }
     return render(request, 'complainapp/login_act.html', context)
@@ -717,7 +840,15 @@ def login_activity(request):
     # login_act = AdminActivityAdmin(AdminActivity,admin.site)
     # return login_act.changelist_view(request)
     
-
+@login_required
+@user_passes_test(is_super)
+def delete_login_activity(request, activity_id):
+    if request.method == "DELETE":
+        activity = get_object_or_404(AdminActivity, pk=activity_id)
+        activity.delete()
+        return JsonResponse({'message': 'User deleted successfully.'}, status=204)
+    else:
+        return JsonResponse({'error': 'Method not allowed.'}, status=405)
 
 def logout_handle(request):
     logout(request)

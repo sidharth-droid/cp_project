@@ -29,6 +29,12 @@ def set_ack_number(sender, instance, **kwargs):
             if not Complains.objects.filter(ack_number=ack_number).exists():
                 unique_ack = True
                 instance.ack_number = ack_number
+@receiver(post_save, sender=User)
+def create_or_update_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+    else:
+        instance.profile.save()
 # @receiver(post_save, sender=Complains)
 # def model_saved(sender, instance, **kwargs):
 #     print("Model instance saved")
@@ -40,19 +46,19 @@ def set_ack_number(sender, instance, **kwargs):
 #     export_to_excel()
 
 
-@receiver(post_save, sender=User)
-def create_or_update_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
-    instance.profile.save()
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
+# @receiver(post_save, sender=User)
+# def create_or_update_user_profile(sender, instance, created, **kwargs):
+#     if created:
+#         Profile.objects.create(user=instance)
+#     instance.profile.save()
+# @receiver(post_save, sender=User)
+# def create_user_profile(sender, instance, created, **kwargs):
+#     if created:
+#         Profile.objects.create(user=instance)
 
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
+# @receiver(post_save, sender=User)
+# def save_user_profile(sender, instance, **kwargs):
+#     instance.profile.save()
 
 
 # @receiver(user_logged_in)
