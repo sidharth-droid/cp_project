@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
+from django.shortcuts import redirect
 from . import views
 urlpatterns = [
     path('admin/download/<str:data_type>/', views.download_excel, name='download_excel'),
@@ -16,6 +17,7 @@ urlpatterns = [
     
 
     path('admin/login/',views.AdminLogin,name='admin_login'),
+    path('', lambda request: redirect('admin_login'), name='login_admin'),
     path('admin/dashboard/',views.AdminDashboard,name='admin_dashboard'),
 
     path('admin/complains/', views.complain_list_view, name='view_complains'),

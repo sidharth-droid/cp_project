@@ -24,7 +24,7 @@ LOGIN_URL = '/ComplainApp/admin/login/'
 SECRET_KEY = 'django-insecure-gw51hi23-jt8_nuz5_)k6!n!y3d6)qg7$d296*arqsm2z1eh7p'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
