@@ -477,12 +477,12 @@ def AdminDashboard(request):
         if normalized_status in status_dict:
             status_dict[normalized_status] = entry['count']
     # status_percentages = {entry['status']: (entry['count'] / total_cases) * 100 for entry in status_counts}
-    status_percentages = {status: (count / total_cases1) * 100 for status, count in status_dict.items()}
+    # status_percentages = {status: (count / total_cases1) * 100 for status, count in status_dict.items()}
 
-    pie_chart_data = {
-        'labels': list(status_percentages.keys()),
-        'data': list(status_percentages.values())
-    }
+    # pie_chart_data = {
+    #     'labels': list(status_percentages.keys()),
+    #     'data': list(status_percentages.values())
+    # }
     designation = ""
     if is_super(request.user):
         designation = "Admin"
@@ -504,7 +504,7 @@ def AdminDashboard(request):
         'complains':complains,
         'complains1':complains1,
         'chart_data': chart_data,
-        'pie_chart_data': pie_chart_data,
+        # 'pie_chart_data': pie_chart_data,
         'start_date': start_date,  # Ensure the date is sent back to the template
         'end_date': end_date,
         'time_range': time_range,
