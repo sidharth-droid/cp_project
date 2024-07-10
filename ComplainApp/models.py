@@ -1,22 +1,10 @@
 from django.db import models
-from multiselectfield import MultiSelectField
 from django.contrib.auth.models import User
 import string
 from django.utils.crypto import get_random_string
 from django.utils import timezone
 
 
-Fraud_Type_Choices = [
-    ('investment_scam','Investment Scam'),
-    ('fake_social_media','Fake Social Media'),
-    ('credit_card_scam','Credit Card Scam'),
-    ('fake_loan_scam','Fake Loan Scam'),
-    ('crypto_scam','Cryptocurrency Scam'),
-    ('hacking','Hacking'),
-    ('sextortion','Sextortion'),
-    ('defamation','Defamation'),
-    ('custom','Custom')
-]
 class Complains(models.Model):
     Date = models.DateTimeField(auto_now_add=True)
     ack_number = models.CharField(max_length=20,primary_key=True)
@@ -27,15 +15,12 @@ class Complains(models.Model):
     description = models.TextField(blank=True,null=True)
     accusedAccountNumbers = models.TextField(blank=True,null=True)
     accusedSuspiciousItem = models.TextField(blank=True,null=True)
-    # fraud_type = MultiSelectField(choices=Fraud_Type_Choices,max_choices=9)
     fraud_type = models.TextField()
-    # custom_fraud_type = models.CharField(max_length=255, blank=True, null=True)
     steps_taken = models.TextField(blank=True,null=True)
-    # images_videos = models.FileField(upload_to='case_files/', blank=True, null=True)
-    status = models.CharField(max_length=50, default='Pending',choices=[('open','Open'),('in review','In Review'),('visit ps','Visit Police Station'),('in progress','In Progress'),('closed','Closed (Reach out to Police Station)')])
+    files = models.URLField(max_length=2000,db_index=True,blank=True,null=True)
+    status = models.CharField(max_length=50, default='Verification Pending',choices=[('open','Open'),('in review','In Review'),('visit ps','Visit Police Station'),('in progress','In Progress'),('closed','Closed (Reach out to Police Station)')])
     investigating_officer = models.CharField(max_length=255,blank=True,null=True)
     close_date = models.DateTimeField(blank=True, null=True)
-
 
     def __str__(self):
         return f'{self.ack_number}-{self.name}'
@@ -53,6 +38,7 @@ class Complains(models.Model):
             self.close_date = None
 
         super(Complains, self).save(*args, **kwargs)
+
 class FIR(models.Model):
     complain = models.OneToOneField(Complains, on_delete=models.CASCADE, primary_key=True, related_name='fir')
     Date = models.DateTimeField(auto_now_add=True)
@@ -75,17 +61,6 @@ class FIR(models.Model):
         return f'{self.fir_number} - {self.complain.name}'
 
 
-
-
-
-
-class Attachment(models.Model):
-    complain = models.ForeignKey(Complains, related_name='attachments', on_delete=models.CASCADE)
-    file = models.FileField(upload_to='case_files/')
-    upload_date = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f'Attachment for {self.complain.ack_number}'
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     email = models.EmailField(blank=True, null=True)
@@ -99,27 +74,58 @@ class AdminActivity(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.login_time}"
     
-class ScamPhone(models.Model):
-    number = models.CharField(max_length=30,unique=True,db_index=True)
-    status = models.CharField(max_length=60,choices=[('confirmed',"Confirmed"),('unconfirmed','Unconfirmed')])
-    details = models.TextField(blank=True,null=True)
-    complaints = models.PositiveIntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return self.number
-class ScamLink(models.Model):
-    url = models.CharField(max_length=255, unique=True,db_index=True)
-    status = models.CharField(max_length=60,choices=[('confirmed',"Confirmed"),('unconfirmed','Unconfirmed')])
-    details = models.TextField(blank=True,null=True)
-    complaints = models.PositiveIntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return self.url
-class ScamEmail(models.Model):
-    email = models.EmailField(max_length=255, unique=True,db_index=True)
-    status = models.CharField(max_length=60,choices=[('confirmed',"Confirmed"),('unconfirmed','Unconfirmed')])
-    details = models.TextField(blank=True,null=True)
-    complaints = models.PositiveIntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return self.email
+
+
+
+
+    
+
+# ---------------Unused Models--------------------
+# images_videos = models.FileField(upload_to='case_files/', blank=True, null=True)
+# custom_fraud_type = models.CharField(max_length=255, blank=True, null=True)
+# fraud_type = MultiSelectField(choices=Fraud_Type_Choices,max_choices=9)
+# from multiselectfield import MultiSelectField
+# Fraud_Type_Choices = [
+#     ('investment_scam','Investment Scam'),
+#     ('fake_social_media','Fake Social Media'),
+#     ('credit_card_scam','Credit Card Scam'),
+#     ('fake_loan_scam','Fake Loan Scam'),
+#     ('crypto_scam','Cryptocurrency Scam'),
+#     ('hacking','Hacking'),
+#     ('sextortion','Sextortion'),
+#     ('defamation','Defamation'),
+#     ('custom','Custom')
+# ]
+
+# class ScamPhone(models.Model):
+#     number = models.CharField(max_length=30,unique=True,db_index=True)
+#     status = models.CharField(max_length=60,choices=[('confirmed',"Confirmed"),('unconfirmed','Unconfirmed')])
+#     details = models.TextField(blank=True,null=True)
+#     complaints = models.PositiveIntegerField(default=0)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     def __str__(self):
+#         return self.number
+# class ScamLink(models.Model):
+#     url = models.CharField(max_length=255, unique=True,db_index=True)
+#     status = models.CharField(max_length=60,choices=[('confirmed',"Confirmed"),('unconfirmed','Unconfirmed')])
+#     details = models.TextField(blank=True,null=True)
+#     complaints = models.PositiveIntegerField(default=0)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     def __str__(self):
+#         return self.url
+# class ScamEmail(models.Model):
+#     email = models.EmailField(max_length=255, unique=True,db_index=True)
+#     status = models.CharField(max_length=60,choices=[('confirmed',"Confirmed"),('unconfirmed','Unconfirmed')])
+#     details = models.TextField(blank=True,null=True)
+#     complaints = models.PositiveIntegerField(default=0)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     def __str__(self):
+#         return self.email
+
+# class Attachment(models.Model):
+#     complain = models.ForeignKey(Complains, related_name='attachments', on_delete=models.CASCADE)
+#     file = models.FileField(upload_to='case_files/')
+#     upload_date = models.DateTimeField(auto_now_add=True)
+
+#     def __str__(self):
+#         return f'Attachment for {self.complain.ack_number}'

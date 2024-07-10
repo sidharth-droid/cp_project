@@ -27,8 +27,6 @@ class SingleSessionMiddleware:
                 if request.session.session_key not in profile.session_keys:
                     profile.session_keys.append(request.session.session_key)
                     profile.save()
-                # if not self.is_session_valid(request):
-                #     return redirect(reverse('session_invalidated'))
             except Profile.DoesNotExist:
                 pass
 
@@ -38,3 +36,9 @@ class SingleSessionMiddleware:
         """Check if the session key is in the user's profile session keys."""
         return request.session.session_key in request.user.profile.session_keys
 
+
+
+# --------------Unused------------------
+# after profile.save()
+    # if not self.is_session_valid(request):
+                #     return redirect(reverse('session_invalidated'))
