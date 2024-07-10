@@ -37,7 +37,7 @@ from django.utils.translation import gettext as _
 def session_invalidated(request):
     if request.user.is_authenticated:
         logout(request)
-    return render(request, 'complainapp/session_invalidated.html')
+    return render(request, 'ComplainApp/session_invalidated.html')
 class LoginView(views.APIView):
     def post(self,request):
         username = request.data.get('username')
@@ -163,7 +163,7 @@ def complain_list_view(request):
         'username':request.user.username,
         'designation':designation
     }
-    return render(request, 'complainapp/view_complains.html', context)
+    return render(request, 'ComplainApp/view_complains.html', context)
 
 @login_required
 def complain_create_view(request):
@@ -195,7 +195,7 @@ def complain_create_view(request):
         'designation':designation
 
     }
-    return render(request, 'complainapp/add_complain.html', context)
+    return render(request, 'ComplainApp/add_complain.html', context)
 
 
 @login_required
@@ -226,7 +226,7 @@ def complain_update_view(request, pk):
         'complaint': complain,
         'designation':designation
     }
-    return render(request, 'complainapp/edit_complain.html', context)
+    return render(request, 'ComplainApp/edit_complain.html', context)
 
 @login_required
 def complain_delete_view(request, pk):
@@ -311,7 +311,7 @@ def fir_list_view(request):
 
 
     }
-    return render(request, 'complainapp/view_fir.html', context)
+    return render(request, 'ComplainApp/view_fir.html', context)
 @login_required
 def fir_create_view(request):
     if request.method == 'POST':
@@ -340,7 +340,7 @@ def fir_create_view(request):
         'designation':designation
 
     }
-    return render(request, 'complainapp/add_fir.html', context)
+    return render(request, 'ComplainApp/add_fir.html', context)
 
 @login_required
 def fir_update_view(request, pk):
@@ -370,7 +370,7 @@ def fir_update_view(request, pk):
         'fir': fir,
         'designation':designation
     }
-    return render(request, 'complainapp/edit_fir.html', context)
+    return render(request, 'ComplainApp/edit_fir.html', context)
 
 @login_required
 def fir_delete_view(request, pk):
@@ -514,7 +514,7 @@ def AdminDashboard(request):
         'username':request.user.username,
         'designation':designation
     }
-    return render(request, 'complainapp/admin_dashboard.html', context)
+    return render(request, 'ComplainApp/admin_dashboard.html', context)
 
 
 @login_required
@@ -537,7 +537,7 @@ def user_list_view(request):
         designation = "Staff"
     else:
         designation = "Member"
-    return render(request, 'complainapp/user_list.html', {'users': users,'is_superuser': request.user.is_superuser,'username':request.user.username,
+    return render(request, 'ComplainApp/user_list.html', {'users': users,'is_superuser': request.user.is_superuser,'username':request.user.username,
         'designation': designation})
 # View to create user
 @login_required
@@ -559,7 +559,7 @@ def user_create_view(request):
         designation = "Staff"
     else:
         designation = "Member"
-    return render(request, 'complainapp/user_form.html', {'form': form,'is_superuser': request.user.is_superuser,'username':request.user.username,
+    return render(request, 'ComplainApp/user_form.html', {'form': form,'is_superuser': request.user.is_superuser,'username':request.user.username,
         'designation': designation})
 
 # View to update user
@@ -590,7 +590,7 @@ def user_update_view(request, user_id):
         designation = "Staff"
     else:
         designation = "Member"
-    return render(request, 'complainapp/user_update.html', {
+    return render(request, 'ComplainApp/user_update.html', {
         'form': form,
         'password_form': password_form,
         'user': user,'is_superuser': request.user.is_superuser,
@@ -694,7 +694,7 @@ def login_activity(request):
         'designation': designation
 
     }
-    return render(request, 'complainapp/login_act.html', context)
+    return render(request, 'ComplainApp/login_act.html', context)
     
 @login_required
 @user_passes_test(is_super)
@@ -913,7 +913,7 @@ def download_fir(request):
 # @permission_required('auth.view_group', raise_exception=True)
 # def group_list_view(request):
 #     groups = Group.objects.all()
-#     return render(request, 'complainapp/group_list.html', {'groups': groups})
+#     return render(request, 'ComplainApp/group_list.html', {'groups': groups})
 
 # # View to create group
 # @login_required
@@ -926,7 +926,7 @@ def download_fir(request):
 #             return redirect('group_list')
 #     else:
 #         form = GroupForm()
-#     return render(request, 'complainapp/group_form.html', {'form': form})
+#     return render(request, 'ComplainApp/group_form.html', {'form': form})
 
 
 # # View to update group
@@ -941,7 +941,7 @@ def download_fir(request):
 #             return redirect('group_list')
 #     else:
 #         form = GroupForm(instance=group)
-#     return render(request, 'complainapp/group_form.html', {'form': form})
+#     return render(request, 'ComplainApp/group_form.html', {'form': form})
 
 
 # # View to delete group
@@ -952,7 +952,7 @@ def download_fir(request):
 #     if request.method == 'POST':
 #         group.delete()
 #         return redirect('group_list')
-#     return render(request, 'complainapp/group_confirm_delete.html', {'group': group})
+#     return render(request, 'ComplainApp/group_confirm_delete.html', {'group': group})
 # class LinkDetail(generics.RetrieveAPIView):
 #     queryset = ScamLink.objects.all()
 #     serializer_class = LinkSerializer
@@ -1003,7 +1003,7 @@ def download_fir(request):
 # @user_passes_test(is_staff)
 # def view_complains(request):
 #     complains = Complains.objects.all()
-#     return render(request, 'complainapp/view_complains.html', {'complains': complains})
+#     return render(request, 'ComplainApp/view_complains.html', {'complains': complains})
 
 # @login_required
 # @user_passes_test(is_staff)
@@ -1018,7 +1018,7 @@ def download_fir(request):
 #             messages.error(request, "There was an error adding the complain.")
 #     else:
 #         form = ComplainForm()
-#     return render(request, 'complainapp/add_complain.html', {'form': form})
+#     return render(request, 'ComplainApp/add_complain.html', {'form': form})
 
 # @login_required
 # @user_passes_test(is_staff)
@@ -1034,7 +1034,7 @@ def download_fir(request):
 #             messages.error(request, "There was an error updating the complain.")
 #     else:
 #         form = ComplainForm(instance=complain)
-#     return render(request, 'complainapp/edit_complain.html', {'form': form})
+#     return render(request, 'ComplainApp/edit_complain.html', {'form': form})
 
 # @login_required
 # @user_passes_test(is_staff)
@@ -1072,23 +1072,23 @@ def download_fir(request):
     # context = {
     #     'complains': complain,
     # }
-    # return render(request, 'complainapp/delete_complain.html', context)
+    # return render(request, 'ComplainApp/delete_complain.html', context)
 
 # class ComplainDeleteView(DeleteView):
 #     model = Complains
-#     template_name = 'complainapp/delete_complain.html'
+#     template_name = 'ComplainApp/delete_complain.html'
 #     success_url = reverse_lazy('view_complains')
 
 # class ComplainUpdateView(UpdateView):
 #     model = Complains
 #     form_class = ComplainForm
-#     template_name = 'complainapp/edit_complain.html'
+#     template_name = 'ComplainApp/edit_complain.html'
 #     success_url = reverse_lazy('view_complains')
 
 # class ComplainCreateView(CreateView):
 #     model = Complains
 #     form_class = ComplainForm
-#     template_name = 'complainapp/add_complain.html'
+#     template_name = 'ComplainApp/add_complain.html'
 #     success_url = reverse_lazy('add_complain')
 #     def get_context_data(self, **kwargs):
 #         data = super().get_context_data(**kwargs)
