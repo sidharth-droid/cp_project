@@ -762,6 +762,8 @@ def download_excel(request, data_type):
     elif data_type == "registered_today":
         today = datetime.date.today()
         data = Complains.objects.filter(Date__date=today)
+    elif data_type == "pending":
+        data = Complains.objects.exclude(status='closed')
     wb = Workbook()
     ws = wb.active
     ws.title = data_type

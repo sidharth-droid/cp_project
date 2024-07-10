@@ -290,9 +290,7 @@ main table tbody tr:last-child td{
     
   
 }
-/* table td {
-    text-align: center;
-} */
+
 #search-form {
     display: flex;
     align-items: center;

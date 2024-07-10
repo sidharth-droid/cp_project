@@ -115,13 +115,71 @@
 
     .right {
         margin-bottom: 114rem;
-        /* background-color: #1d23dc; */
         display: inline;
     }
 
     .top {
         margin: auto;
     }
+    .table-contain{
+    max-width: 80rem;
+}
+.table-contain {
+    width: 90%;
+    overflow-x: auto;
+}
+
+.table-fixed {
+    overflow-y: auto;
+    max-height: 75vh;
+}
+
+
+.table-fixed th, .table-fixed td{
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    word-wrap: break-word;
+    white-space: normal;
+}
+.table-fixed th {
+    font-weight: bold;
+    white-space: normal;
+    padding: 15px;
+}
+.table-fixed td{
+    white-space: normal; 
+    word-break: break-word; 
+}
+.table-fixed .ack-column {
+    min-width: 100px; 
+    word-break: break-all;
+}
+.table-fixed thead th {
+    position: sticky;
+    top: 0;
+}
+    @media screen and (max-width:768px) {
+        .top-nav{
+        width: inherit;
+    }
+    main {
+            margin-top: 8rem;
+            padding: 0 1rem;
+        }
+
+        main .insights{
+        max-width: 75%;
+    }
+    .graph1{
+        max-width: 90%;
+    }
+    main .table-contain{
+        max-width: 90%;
+    }
+
+    }
+    
 </style>
 
 
@@ -225,6 +283,8 @@
 <div class="recent-complains">
 
     <h2>Recent Complains</h2>
+    <div class="table-contain">
+        <div class="table-fixed">
     <table>
         <thead>
             <tr>
@@ -251,6 +311,8 @@
 
         </tbody>
     </table>
+</div>
+</div>
 </div>
 </div>
 <script>

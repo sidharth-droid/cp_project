@@ -382,7 +382,7 @@ main .date input{
     .top-nav {
         left: 0;
         right: 0;
-        width: 100%;
+        width: inherit;
         border-radius: 0;
     }
     
