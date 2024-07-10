@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+import dj_database_url
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 LOGIN_URL = '/ComplainApp/admin/login/'
@@ -25,11 +26,11 @@ SECRET_KEY = 'django-insecure-gw51hi23-jt8_nuz5_)k6!n!y3d6)qg7$d296*arqsm2z1eh7p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-# CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',
-]
+ALLOWED_HOSTS = ['*']
+CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ALLOWED_ORIGINS = [
+#     'http://localhost:5173',
+# ]
 
 # Application definition
 
@@ -84,11 +85,14 @@ WSGI_APPLICATION = 'CP_Odisha.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.parse("postgresql://cp_db_6ktr_user:6gybEZcIvne2XsIFET7I310S9A3ATljJ@dpg-cq78pdlds78s738srnt0-a.oregon-postgres.render.com/cp_db_6ktr")
 }
 
 
