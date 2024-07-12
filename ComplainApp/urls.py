@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.conf.urls.static import static
-from django.urls import path
+from django.urls import path,include
 from django.shortcuts import redirect
 from . import views
 urlpatterns = [
@@ -19,6 +19,11 @@ urlpatterns = [
     path('admin/login/',views.AdminLogin,name='admin_login'),
     path('', lambda request: redirect('admin_login'), name='login_admin'),
     path('admin/dashboard/',views.AdminDashboard,name='admin_dashboard'),
+    path('send_otp/', views.send_otp, name='send_otp'),
+    path('verify_otp/', views.verify_otp, name='verify_otp'),
+    path('resend_otp/', views.resend_otp, name='resend_otp'),
+    # path('', include(('two_factor.urls', 'two_factor'), namespace='two_factor')),
+
 
     path('admin/complains/', views.complain_list_view, name='view_complains'),
     path('admin/complains/add/', views.complain_create_view, name='add_complain'),

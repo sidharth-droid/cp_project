@@ -12,7 +12,8 @@ class ComplainsForm(forms.ModelForm):
     def clean_mobile(self):
         mobile_numbers = self.cleaned_data['mobile_number']
         return mobile_numbers
-    
+class OTPForm(forms.Form):
+    otp = forms.CharField(max_length=6, required=True)
 class AdminLoginForm(forms.Form):
     username=forms.CharField(max_length=150,widget=forms.TextInput(attrs={
         'class':'validate',

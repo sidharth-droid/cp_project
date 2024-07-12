@@ -25,19 +25,26 @@ from .admin import AdminActivityAdmin
 from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
-import datetime,csv
+import datetime,csv,hashlib
 from .forms import ComplainForm,CustomUserChangeForm,CustomUserCreationForm,FIRForm
+from django.core.mail import send_mail
+from .models import OTP
+from .forms import OTPForm
+import hashlib
 import json
 from openpyxl import Workbook
 from io import BytesIO
 from django.db.models.functions import TruncMonth,TruncYear,TruncWeek,Lower
 from django import forms
 from django.utils.translation import gettext as _
+# from django_otp.decorators import otp_required
+# from two_factor.forms import AuthenticationTokenForm, BackupTokenForm
 
 def session_invalidated(request):
     if request.user.is_authenticated:
         logout(request)
     return render(request, 'ComplainApp/session_invalidated.html')
+
 class LoginView(views.APIView):
     def post(self,request):
         username = request.data.get('username')
@@ -87,10 +94,17 @@ def AdminLogin(request):
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
             user = form.get_user()
-            if user.is_staff:
+            if user.is_superuser:
+                auth_login(request, user)
+                # invalidate_previous_sessions(user)
+                # return redirect('admin_dashboard')
+                return redirect('send_otp')
+            elif user.is_staff and not user.is_superuser:
                 auth_login(request, user)
                 invalidate_previous_sessions(user)
                 return redirect('admin_dashboard')
+
+                # return redirect('two_factor:login')
             else:
                 messages.error(request, "You are not authorized to access the admin panel.")
         else:
@@ -407,9 +421,81 @@ def get_pie_chart_data(request, time_range):
         'data': counts
     })
 
+
+@login_required
+@user_passes_test(is_super)
+def send_otp(request):
+    otp = OTP.objects.create(user=request.user)
+    raw_otp = otp.generate_otp()
+    send_mail(
+        'Your OTP Code',
+        f'Your OTP code is {raw_otp}',
+        'commissioneratepolice@proton.me',
+        [request.user.email],
+        fail_silently=False,
+    )
+    # return render(request, 'ComplainApp/otp_sent.html')
+    return redirect('verify_otp')
+
+@login_required
+@user_passes_test(is_super)
+def verify_otp(request):
+    if request.method == 'POST':
+        form = OTPForm(request.POST)
+        if form.is_valid():
+            otp_code = form.cleaned_data['otp']
+            try:
+                hashed_otp = hashlib.sha256(otp_code.encode()).hexdigest()
+                otp = OTP.objects.get(user=request.user, otp_code=hashed_otp, is_active=True)
+                if otp.is_valid():
+                    otp.is_active = False
+                    otp.save()
+                    request.session['otp_verified'] = True
+                    invalidate_previous_sessions(request.user)
+                    return redirect('admin_dashboard')
+                else:
+                    form.add_error('otp', 'OTP has expired or is invalid.')
+            except OTP.DoesNotExist:
+                form.add_error('otp', 'Invalid OTP')
+    else:
+        form = OTPForm()
+    try:
+        otp = OTP.objects.get(user=request.user, is_active=True)
+        time_to_expiry = otp.calculate_time_to_expiry() 
+        print("time",time_to_expiry)
+        otp_expiry_time = int(time_to_expiry.total_seconds() / 60)
+    except OTP.DoesNotExist:
+        otp_expiry_time = None
+    print(otp_expiry_time)
+    return render(request, 'ComplainApp/verify_otp.html', {'form': form,'otp_expiry_time': otp_expiry_time})
+@login_required
+@user_passes_test(is_super)
+def resend_otp(request):
+    try:
+        otp = OTP.objects.filter(user=request.user, is_active=True).update(is_active=False)
+    except OTP.DoesNotExist:
+        pass
+    
+    
+    new_otp = OTP.objects.create(user=request.user)
+    raw_otp = new_otp.generate_otp()
+    
+    send_mail(
+        'Your New OTP Code',
+        f'Your new OTP code is {raw_otp}',
+        'your_email@gmail.com',
+        [request.user.email],
+        fail_silently=False,
+    )
+    
+    # messages.success(request, 'New OTP has been sent to your email.')
+    return redirect('verify_otp')
 @login_required
 @user_passes_test(is_staff)
+# @otp_required
 def AdminDashboard(request):
+    if not request.session.get('otp_verified') and request.user.is_superuser:
+        return redirect('verify_otp')
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
     time_range = request.GET.get('time_range', 'monthly')

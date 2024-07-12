@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 import string
 from django.utils.crypto import get_random_string
 from django.utils import timezone
-
+import random,hashlib
 
 class Complains(models.Model):
     Date = models.DateTimeField(auto_now_add=True)
@@ -60,6 +60,25 @@ class FIR(models.Model):
     def __str__(self):
         return f'{self.fir_number} - {self.complain.name}'
 
+class OTP(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    otp_code = models.CharField(max_length=64)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    def generate_otp(self):
+        OTP.objects.filter(user=self.user, is_active=True).update(is_active=False)
+        raw_otp = str(random.randint(100000, 999999))
+        self.otp_code = hashlib.sha256(raw_otp.encode()).hexdigest()
+        self.save()
+        return raw_otp
+
+    def is_valid(self):
+        expiration_time = timezone.now() - timezone.timedelta(minutes=3)
+        return self.created_at > expiration_time and self.is_active
+    def calculate_time_to_expiry(self):
+        expiration_time = self.created_at + timezone.timedelta(minutes=3)
+        return expiration_time - timezone.now()
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

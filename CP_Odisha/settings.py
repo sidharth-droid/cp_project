@@ -24,7 +24,7 @@ LOGIN_URL = '/ComplainApp/admin/login/'
 SECRET_KEY = 'django-insecure-gw51hi23-jt8_nuz5_)k6!n!y3d6)qg7$d296*arqsm2z1eh7p'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
@@ -45,6 +45,10 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    # 'django_otp',
+    # 'django_otp.plugins.otp_totp',
+    # 'two_factor',
+    # 'two_factor.plugins.phonenumber',
     # 'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
 ]
@@ -57,6 +61,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    # 'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'ComplainApp.middleware.SingleSessionMiddleware',
@@ -154,3 +159,10 @@ REST_FRAMEWORK = {
     #     'rest_framework.permissions.AllowAny',
     # ],
 }
+# TWO_FACTOR_PATCH_ADMIN = True  # Add this if you want to patch the Django admin with two-factor authentication
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'scamscamq@gmail.com'
+EMAIL_HOST_PASSWORD = 'igvtyqcfkhkrivxz'
