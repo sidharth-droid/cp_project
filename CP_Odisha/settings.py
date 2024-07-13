@@ -21,10 +21,10 @@ LOGIN_URL = '/ComplainApp/admin/login/'
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-gw51hi23-jt8_nuz5_)k6!n!y3d6)qg7$d296*arqsm2z1eh7p'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = str(os.environ.get('DEBUG')) == '1'
 
 ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
@@ -45,27 +45,20 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    # 'django_otp',
-    # 'django_otp.plugins.otp_totp',
-    # 'two_factor',
-    # 'two_factor.plugins.phonenumber',
-    # 'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Add WhiteNoise middleware here
+    'whitenoise.middleware.WhiteNoiseMiddleware', 
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    # 'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'ComplainApp.middleware.SingleSessionMiddleware',
-    # 'ComplainApp.middleware.UserActivityMiddleware',
 ]
 
 ROOT_URLCONF = 'CP_Odisha.urls'
@@ -99,7 +92,15 @@ WSGI_APPLICATION = 'CP_Odisha.wsgi.application'
 #     }
 # }
 DATABASES = {
-    'default': dj_database_url.parse("postgresql://cp_db_6ktr_user:6gybEZcIvne2XsIFET7I310S9A3ATljJ@dpg-cq78pdlds78s738srnt0-a.oregon-postgres.render.com/cp_db_6ktr")
+    # 'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
+    'default': {
+        'ENGINE': os.environ.get('DB_ENGINE'),
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASS'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT')
+        }
 }
 
 
@@ -159,10 +160,9 @@ REST_FRAMEWORK = {
     #     'rest_framework.permissions.AllowAny',
     # ],
 }
-# TWO_FACTOR_PATCH_ADMIN = True  # Add this if you want to patch the Django admin with two-factor authentication
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'scamscamq@gmail.com'
-EMAIL_HOST_PASSWORD = 'igvtyqcfkhkrivxz'
+EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND')
+EMAIL_HOST = os.environ.get('EMAIL_HOST')
+EMAIL_PORT = os.environ.get('EMAIL_PORT')
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')

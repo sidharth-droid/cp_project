@@ -27,7 +27,7 @@ class AdminLoginForm(forms.Form):
 class ComplainForm(forms.ModelForm):
     class Meta:
         model = Complains
-        fields = ['name','mobile_number','email','address','fraud_type','steps_taken','status','description','accusedAccountNumbers','accusedSuspiciousItem','investigating_officer']
+        fields = ['name','mobile_number','email','address','fraud_type','steps_taken','status','description','accusedAccountNumbers','accusedSuspiciousItem','files','investigating_officer']
       
 class FIRForm(forms.ModelForm):
     complain = forms.ModelChoiceField(queryset=Complains.objects.all(), empty_label="Select a Complain")
@@ -79,51 +79,3 @@ class CustomUserChangeForm(UserChangeForm):
 
 
 
-
-
-
-#--------Unused Form------------------
-
- # widgets = {
-        #     'name': forms.TextInput(attrs={'class': 'validate'}),
-        #     'mobile_number': forms.Textarea(attrs={'class': 'materialize-textarea', 'help_text': 'Enter Mobile Numbers'}),
-        #     'address': forms.Textarea(attrs={'class': 'materialize-textarea', 'help_text': 'Enter Address'}),
-        #     'email': forms.EmailInput(),
-        #     'fraud_type': forms.Textarea(attrs={'class': 'materialize-textarea', 'help_text': 'Enter Type of Fraud'}),
-        #     'steps_taken': forms.Textarea(attrs={'class': 'materialize-textarea'}),
-        #     # 'images_videos': forms.FileInput(),
-        #     'status': forms.Select(choices=[('open', 'Open'), ('in review', 'In Review'), ('visit ps', 'Visit Police Station'), 
-        #                                     ('in progress', 'In Progress'), ('closed', 'Closed (Reach out to Police Station)')],
-        #                          attrs={'class': 'validate'}),
-        #     'investigating_officer': forms.TextInput(attrs={'class': 'validate'}),
-        # }
-
-
-# class AttachmentForm(forms.ModelForm):
-#     class Meta:
-#         model = Attachment
-#         fields = ['file']
-
-# AttachmentFormSet = inlineformset_factory(
-#     Complains, Attachment, form=AttachmentForm, extra=1, can_delete=True
-# )
-
-# Form for Group creation and update
-# class GroupForm(forms.ModelForm):
-#     users = forms.ModelMultipleChoiceField(
-#         queryset=User.objects.all(),
-#         required=False,
-#         widget=forms.CheckboxSelectMultiple
-#     )
-
-#     class Meta:
-#         model = Group
-#         fields = ['name', 'permissions', 'users']
-
-#     def save(self, commit=True):
-#         group = super().save(commit=False)
-#         if commit:
-#             group.save()
-#             self.save_m2m()
-#             group.user_set.set(self.cleaned_data['users'])
-#         return group

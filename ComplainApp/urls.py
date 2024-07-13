@@ -22,7 +22,6 @@ urlpatterns = [
     path('send_otp/', views.send_otp, name='send_otp'),
     path('verify_otp/', views.verify_otp, name='verify_otp'),
     path('resend_otp/', views.resend_otp, name='resend_otp'),
-    # path('', include(('two_factor.urls', 'two_factor'), namespace='two_factor')),
 
 
     path('admin/complains/', views.complain_list_view, name='view_complains'),

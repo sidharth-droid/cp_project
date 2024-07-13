@@ -177,6 +177,7 @@
                         <th class="email">Email</th>
                         <th class="address">Address</th>
                         <th class="io">Investigating Officer</th>
+                        <th class="file">Files</th>
                         {% if is_superuser %}
                         <th class="delete">Delete</th>
                         {% endif %}
@@ -204,6 +205,7 @@
                         <td class="email">{{ complain.email }}</td>
                         <td class="address">{{ complain.address }}</td>
                         <td class="io">{{ complain.investigating_officer }}</td>
+                        <td class="io">{{ complain.files }}</td>
                         {% if is_superuser %}
                         <td>
                             

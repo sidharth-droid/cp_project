@@ -30,7 +30,7 @@ from .forms import ComplainForm,CustomUserChangeForm,CustomUserCreationForm,FIRF
 from django.core.mail import send_mail
 from .models import OTP
 from .forms import OTPForm
-import hashlib
+import hashlib,os
 import json
 from openpyxl import Workbook
 from io import BytesIO
@@ -430,9 +430,10 @@ def send_otp(request):
     send_mail(
         'Your OTP Code',
         f'Your OTP code is {raw_otp}',
-        'commissioneratepolice@proton.me',
+        'commissioneratepolice@gmail.com',
         [request.user.email],
         fail_silently=False,
+
     )
     # return render(request, 'ComplainApp/otp_sent.html')
     return redirect('verify_otp')
@@ -483,7 +484,7 @@ def resend_otp(request):
     send_mail(
         'Your New OTP Code',
         f'Your new OTP code is {raw_otp}',
-        'your_email@gmail.com',
+        os.environ.get('SEND_EMAIL_USER'),
         [request.user.email],
         fail_silently=False,
     )
@@ -492,7 +493,7 @@ def resend_otp(request):
     return redirect('verify_otp')
 @login_required
 @user_passes_test(is_staff)
-# @otp_required
+
 def AdminDashboard(request):
     if not request.session.get('otp_verified') and request.user.is_superuser:
         return redirect('verify_otp')
@@ -811,7 +812,7 @@ def download_report(request, days):
     response['Content-Disposition'] = f'attachment; filename="report_{days}_days.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(['Date', 'ack_number', 'name', 'status', 'fraud_type'])  # Adjust headers as needed
+    writer.writerow(['Date', 'ack_number', 'name', 'status', 'fraud_type'])  
     for complain in complains:
         writer.writerow([complain.Date, complain.ack_number, complain.name, complain.status, complain.fraud_type])
 
@@ -854,7 +855,7 @@ def download_excel(request, data_type):
     ws = wb.active
     ws.title = data_type
 
-    headers = ["Ack Number", "Mobile Number", "Name", "Address", "Email", "Fraud Type", "Steps Taken", "Status", "Investigating Officer", "Date"]
+    headers = ["Ack Number", "Mobile Number", "Name", "Address", "Email", "Fraud Type", "Description","Accused Account Numbers","Accused Suspicious Items","Steps Taken", "Status", "Investigating Officer", "Files","Date"]
     ws.append(headers)
 
     for complain in data:
@@ -865,9 +866,13 @@ def download_excel(request, data_type):
             complain.address,
             complain.email,
             complain.fraud_type,
+            complain.description,
+            complain.accusedAccountNumbers,
+            complain.accusedSuspiciousItem,
             complain.steps_taken,
             complain.status,
             complain.investigating_officer,
+            complain.files,
             complain.Date.strftime('%Y-%m-%d %H:%M:%S')
         ])
 
@@ -944,266 +949,3 @@ def download_fir(request):
 
 
 
-#----------------Unused Views--------------------
-
-
-# @login_required
-# @user_passes_test(is_super)
-# def user_list(request):
-#     user_admin=UserAdmin(User,admin.site)
-#     return user_admin.changelist_view(request)
-
-# @login_required
-# @user_passes_test(is_super)
-# def user_add(request):
-#     user_admin = UserAdmin(User, admin.site)
-#     return user_admin.add_view(request)
-
-# @login_required
-# @user_passes_test(is_super)
-# def user_change(request, object_id):
-#     user_admin = UserAdmin(User, admin.site)
-#     return user_admin.change_view(request, object_id)
-
-# @login_required
-# @user_passes_test(is_super)
-# def user_delete(request, object_id):
-#     user_admin = UserAdmin(User, admin.site)
-#     return user_admin.delete_view(request, object_id)
-
-# @login_required
-# @user_passes_test(is_super)
-# def group_list(request):
-#     group_admin = GroupAdmin(Group, admin.site)
-#     return group_admin.changelist_view(request)
-
-# @login_required
-# @user_passes_test(is_super)
-# def group_add(request):
-#     group_admin = GroupAdmin(Group, admin.site)
-#     return group_admin.add_view(request)
-
-# @login_required
-# @user_passes_test(is_super)
-# def group_change(request, object_id):
-#     group_admin = GroupAdmin(Group, admin.site)
-#     return group_admin.change_view(request, object_id)
-
-# @login_required
-# @user_passes_test(is_super)
-# def group_delete(request, object_id):
-#     group_admin = GroupAdmin(Group, admin.site)
-#     return group_admin.delete_view(request, object_id)
-# # View to list groups
-# @login_required
-# @permission_required('auth.view_group', raise_exception=True)
-# def group_list_view(request):
-#     groups = Group.objects.all()
-#     return render(request, 'ComplainApp/group_list.html', {'groups': groups})
-
-# # View to create group
-# @login_required
-# @permission_required('auth.add_group', raise_exception=True)
-# def group_create_view(request):
-#     if request.method == 'POST':
-#         form = GroupForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('group_list')
-#     else:
-#         form = GroupForm()
-#     return render(request, 'ComplainApp/group_form.html', {'form': form})
-
-
-# # View to update group
-# @login_required
-# @permission_required('auth.change_group', raise_exception=True)
-# def group_update_view(request, group_id):
-#     group = get_object_or_404(Group, pk=group_id)
-#     if request.method == 'POST':
-#         form = GroupForm(request.POST, instance=group)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('group_list')
-#     else:
-#         form = GroupForm(instance=group)
-#     return render(request, 'ComplainApp/group_form.html', {'form': form})
-
-
-# # View to delete group
-# @login_required
-# @permission_required('auth.delete_group', raise_exception=True)
-# def group_delete_view(request, group_id):
-#     group = get_object_or_404(Group, pk=group_id)
-#     if request.method == 'POST':
-#         group.delete()
-#         return redirect('group_list')
-#     return render(request, 'ComplainApp/group_confirm_delete.html', {'group': group})
-# class LinkDetail(generics.RetrieveAPIView):
-#     queryset = ScamLink.objects.all()
-#     serializer_class = LinkSerializer
-#     lookup_field = 'url'
-#     lookup_url_kwarg = 'url'
-#     def get_object(self):
-#         url_param = self.kwargs.get(self.lookup_url_kwarg)
-#         try:
-#             return ScamLink.objects.get(url=url_param)
-#         except ScamLink.DoesNotExist:
-#             pass
-
-#         normalized_url_param = self.normalize_url(url_param)
-#         for link in ScamLink.objects.all():
-#             normalized_db_url = self.normalize_url(link.url)
-#             print(normalized_db_url)
-#             if normalized_url_param == normalized_db_url:
-#                 return link
-#         self.raise_not_found()
-
-#     def normalize_url(self, url):
-#         parsed_url = urlparse(url)
-#         domain = parsed_url.netloc or parsed_url.path
-#         return domain.lstrip('www.')
-
-#     def raise_not_found(self):
-#         from rest_framework.exceptions import NotFound
-#         raise NotFound(detail="Link not found", code=404)
-    
-# class PhoneDetail(generics.RetrieveAPIView):
-#     queryset = ScamPhone.objects.all()
-#     serializer_class = PhoneSerializer
-#     lookup_field = 'number'
-#     lookup_url_kwarg = 'number'
-# class EmailDetail(generics.RetrieveAPIView):
-#     queryset = ScamEmail.objects.all()
-#     serializer_class = EmailSerializer
-#     lookup_field = 'email'
-#     lookup_url_kwarg = 'email'
-
-
-
-
-
-
-
-# @login_required
-# @user_passes_test(is_staff)
-# def view_complains(request):
-#     complains = Complains.objects.all()
-#     return render(request, 'ComplainApp/view_complains.html', {'complains': complains})
-
-# @login_required
-# @user_passes_test(is_staff)
-# def add_complain(request):
-#     if request.method == 'POST':
-#         form = ComplainForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             messages.success(request, "Complain added successfully.")
-#             return redirect('view_complains')
-#         else:
-#             messages.error(request, "There was an error adding the complain.")
-#     else:
-#         form = ComplainForm()
-#     return render(request, 'ComplainApp/add_complain.html', {'form': form})
-
-# @login_required
-# @user_passes_test(is_staff)
-# def edit_complain(request, complain_id):
-#     complain = get_object_or_404(Complains, pk=complain_id)
-#     if request.method == 'POST':
-#         form = ComplainForm(request.POST, instance=complain)
-#         if form.is_valid():
-#             form.save()
-#             messages.success(request, "Complain updated successfully.")
-#             return redirect('view_complains')
-#         else:
-#             messages.error(request, "There was an error updating the complain.")
-#     else:
-#         form = ComplainForm(instance=complain)
-#     return render(request, 'ComplainApp/edit_complain.html', {'form': form})
-
-# @login_required
-# @user_passes_test(is_staff)
-# def delete_complain(request, complain_id):
-#     complain = get_object_or_404(Complains, pk=complain_id)
-#     complain.delete()
-#     messages.success(request, "Complain deleted successfully.")
-#     return redirect('view_complains')
-
- # monthly_complaints = Complains.objects.annotate(period=period_annotation).values('period').annotate(count=Count('pk'))
-    # closed_complaints = Complains.objects.filter(status='closed').annotate(period=close_period_annotation).values('period').annotate(count=Count('pk'))
-    # chart_data = {
-    #     'labels': [entry['period'].strftime('%Y-%m-%d') if time_range == 'weekly' else entry['period'].strftime('%Y-%m') if time_range == 'monthly' else entry['period'].strftime('%Y') for entry in monthly_complaints],
-    #     'registered_data': [entry['count'] for entry in monthly_complaints],
-    #     'closed_data': [entry['count'] for entry in closed_complaints if entry['period'] in [e['period'] for e in monthly_complaints]]
-    # }
-    # last_month_dates = [(current_date - datetime.timedelta(days=i)) for i in range(30)]
-    # last_month_dates.reverse()
-
-    # daily_registered_complaints = [
-    #     Complains.objects.filter(Date__date=date).count() for date in last_month_dates
-    # ]
-    # daily_closed_complaints = [
-    #     Complains.objects.filter(Date__date=date, status='closed').count() for date in last_month_dates
-    # ]
-    # chart_data = {
-    #     'labels': [date.strftime('%Y-%m-%d') for date in last_month_dates],
-    #     'registered_data': daily_registered_complaints,
-    #     'closed_data': daily_closed_complaints
-    # }
-
-     # if request.method == 'POST':
-    #     complain.delete()
-    #     return redirect('view_complains')  # Adjust the success URL as needed
-    # context = {
-    #     'complains': complain,
-    # }
-    # return render(request, 'ComplainApp/delete_complain.html', context)
-
-# class ComplainDeleteView(DeleteView):
-#     model = Complains
-#     template_name = 'ComplainApp/delete_complain.html'
-#     success_url = reverse_lazy('view_complains')
-
-# class ComplainUpdateView(UpdateView):
-#     model = Complains
-#     form_class = ComplainForm
-#     template_name = 'ComplainApp/edit_complain.html'
-#     success_url = reverse_lazy('view_complains')
-
-# class ComplainCreateView(CreateView):
-#     model = Complains
-#     form_class = ComplainForm
-#     template_name = 'ComplainApp/add_complain.html'
-#     success_url = reverse_lazy('add_complain')
-#     def get_context_data(self, **kwargs):
-#         data = super().get_context_data(**kwargs)
-#         if self.request.POST:
-#             data['attachments'] = AttachmentFormSet(self.request.POST, self.request.FILES)
-#         else:
-#             data['attachments'] = AttachmentFormSet()
-#         return data
-
-#     def form_valid(self, form):
-#         context = self.get_context_data()
-#         attachments = context['attachments']
-#         if form.is_valid() and attachments.is_valid():
-#             self.object = form.save()
-#             attachments.instance = self.object
-#             attachments.save()
-#             return redirect(self.get_success_url())
-#         else:
-#             return self.form_invalid(form)
-
-# class ComplainListView(ListView):
-#     model = Complains
-#     template_name = 'complainapp/view_complains.html'
-
-   # # Log out all other sessions for the same user
-            # Session.objects.filter(
-            #     session_key__in=Session.objects.filter(
-            #         expire_date__gt=timezone.now()
-            #     ).exclude(
-            #         session_key=current_session_key
-            #     ).values_list('session_key', flat=True)
-            # ).delete()
