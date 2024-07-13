@@ -218,7 +218,12 @@ def complain_update_view(request, pk):
     if request.method == 'POST':
         form = ComplainForm(request.POST, instance=complain)
         if form.is_valid():
-            form.save()
+            instance = form.save(commit=False)
+            if instance.status == 'closed':
+                instance.close_date = timezone.now()
+            instance.save()
+            # form.save()
+            
             # messages.success(request, f'Your complaint has been successfully updated.')
             return redirect('view_complains')  # Adjust the success URL as needed
         else:
@@ -506,7 +511,7 @@ def AdminDashboard(request):
             start_date_obj = datetime.datetime.strptime(start_date, '%Y-%m-%d').date()
             end_date_obj = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
             complains = Complains.objects.filter(Date__date__gte=start_date_obj, Date__date__lte=end_date_obj)
-            complains_closed = Complains.objects.filter(close_date__date__gte=start_date_obj, Date__date__lte=end_date_obj)
+            complains_closed = Complains.objects.filter(close_date__date__gte=start_date_obj, close_date__date__lte=end_date_obj)
             total_cases = complains.count()
             closed_cases = complains_closed.count()
 
@@ -873,7 +878,7 @@ def download_excel(request, data_type):
             complain.status,
             complain.investigating_officer,
             complain.files,
-            complain.Date.strftime('%Y-%m-%d %H:%M:%S')
+            complain.Date.strftime('%Y-%m-%d %H:%M:%S'),
         ])
 
     # Save the workbook to a BytesIO object
