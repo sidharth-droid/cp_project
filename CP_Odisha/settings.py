@@ -24,8 +24,8 @@ LOGIN_URL = '/ComplainApp/admin/login/'
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = str(os.environ.get('DEBUG')) == '1'
-# DEBUG = True
+# DEBUG = str(os.environ.get('DEBUG')) == '1'
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
