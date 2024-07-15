@@ -24,8 +24,8 @@ LOGIN_URL = '/ComplainApp/admin/login/'
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = str(os.environ.get('DEBUG')) == '1'
-DEBUG = False
+DEBUG = str(os.environ.get('DEBUG')) == '1'
+
 
 ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_select2'
 ]
 
 MIDDLEWARE = [
@@ -104,7 +105,8 @@ WSGI_APPLICATION = 'CP_Odisha.wsgi.application'
 #         }
 # }
 DATABASES = {
-    'default':dj_database_url.parse("postgresql://cp_db_6ktr_user:6gybEZcIvne2XsIFET7I310S9A3ATljJ@dpg-cq78pdlds78s738srnt0-a.oregon-postgres.render.com/cp_db_6ktr")
+    # 'default':dj_database_url.parse("postgresql://cp_db_6ktr_user:6gybEZcIvne2XsIFET7I310S9A3ATljJ@dpg-cq78pdlds78s738srnt0-a.oregon-postgres.render.com/cp_db_6ktr")
+    'default':dj_database_url.parse("postgresql://cp_database_user:Y5tVfGLosZw3tV6nOufoiS5Uh3YS4HAn@dpg-cqa1lfbv2p9s73cq58dg-a.oregon-postgres.render.com/cp_database")
 }
 
 # Password validation

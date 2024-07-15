@@ -6,7 +6,7 @@ from . import views
 urlpatterns = [
     path('admin/download/<str:data_type>/', views.download_excel, name='download_excel'),
     path('admin/download_fir/', views.download_fir, name='download_fir'),
-    path('admin/report/<int:days>/', views.download_report, name='download_report'),
+    # path('admin/download_report/', views.download_report, name='download_report'),
 
     path('api/complains/',views.ComplainsList.as_view(),name='complains-list'),
     path('api/complains/<str:pk>/',views.ComplaintDetail.as_view(),name='complain-detail'),
@@ -33,6 +33,7 @@ urlpatterns = [
     path('admin/fir/add/', views.fir_create_view, name='add_fir'),
     path('admin/fir/<str:pk>/edit/', views.fir_update_view, name='edit_fir'),
     path('admin/fir/<str:pk>/delete/', views.fir_delete_view, name='delete_fir'),
+    path('select2/', include('django_select2.urls')),
 
     path('admin/users/', views.user_list_view, name='user_list'),
     path('admin/users/create/', views.user_create_view, name='user_create'),

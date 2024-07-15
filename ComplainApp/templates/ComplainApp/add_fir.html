@@ -4,6 +4,8 @@
 {% block name %}{{ username }}{% endblock %}
 {% block desig %}{{ designation }}{% endblock %}
 {% block content %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
 <style>
     /* *{
         appearance: unset;
@@ -23,7 +25,7 @@
     form input[type="datetime-local"],
     form input[type="time"], */
     form select,
-    form textarea {
+    form textarea,.select2-container--default .select2-selection--multiple {
         width: 100%;
         padding: 0.5rem;
         margin: 0.8rem 0;
@@ -109,7 +111,41 @@
     .errorlist li {
         margin-bottom: 0.5rem;
     }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: var(--color-primary);
+        border-color: var(--color-primary);
+        color: var(--color-white);
+        padding: 0.2rem 0.4rem;
+        margin-right: 0.2rem;
+        border-radius: var(--border-radius-2);
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: var(--color-white);
+        margin-left: 0.2rem;
+        font-size: 1.2rem; 
+        padding: 0.1rem 1.5rem;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+        color: var(--color-dark-variant);
+    }
+    .select2-container .select2-selection--single {
+        height: auto;
+        border: 1px solid var(--color-dark-variant);
+        border-radius: var(--border-radius-2);
+        padding: 0.5rem;
+        box-sizing: border-box;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: var(--color-dark);
+        line-height: 1.4;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        top: 50%;
+        transform: translateY(-50%);
+    }
+ 
 </style>
+
 <h1>Add New FIR</h1>
 <div class="date"><input type="date" id="todaydate" value=""><span id="currentTime"></span></div>
 {% if messages %}
@@ -128,5 +164,11 @@
         <button type="submit" class="btn btn-success">Save</button>
     </form>
     <hr/>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.django-select2').select2();
+        });
+    </script>
 {% endblock %}

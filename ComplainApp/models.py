@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 import string
 from django.utils.crypto import get_random_string
 from django.utils import timezone
+from django.db.models import Sum, Count
 import random,hashlib
 
 class Complains(models.Model):
@@ -18,12 +19,15 @@ class Complains(models.Model):
     fraud_type = models.TextField()
     steps_taken = models.TextField(blank=True,null=True)
     files = models.URLField(max_length=2000,db_index=True,blank=True,null=True)
-    status = models.CharField(max_length=50, default='Verification Pending',choices=[('open','Open'),('in review','In Review'),('visit ps','Visit Police Station'),('in progress','In Progress'),('closed','Closed (Reach out to Police Station)')])
-    investigating_officer = models.CharField(max_length=255,blank=True,null=True)
+    status = models.CharField(max_length=50, default='Verification Pending',choices=[('open','Open'),('in review','In Review'),('visit ps','Visit Police Station'),('in progress','In Progress'),('closed','Closed')])
+    enquiry_officer = models.CharField(max_length=255,blank=True,null=True)
+    fraudlent_amount = models.DecimalField(max_digits=20,decimal_places=2,default=0.00,blank=True)
+    amount_recovered = models.DecimalField(max_digits=20,decimal_places=2,default=0.00,blank=True)
     close_date = models.DateTimeField(blank=True, null=True)
 
+
     def __str__(self):
-        return f'{self.ack_number}-{self.name}'
+        return f'{self.ack_number}-{self.name}--[{self.mobile_number}]'
     def save(self, *args, **kwargs):
         if not self.ack_number:
             unique_ack = False
@@ -38,9 +42,22 @@ class Complains(models.Model):
             self.close_date = None
 
         super(Complains, self).save(*args, **kwargs)
+    @classmethod
+    def get_statistics(cls):
+        total_complaints = cls.objects.count()
+        total_closed_complaints = cls.objects.filter(status='closed').count()
+        total_fraud_amount = cls.objects.aggregate(Sum('fraudlent_amount'))['fraudlent_amount__sum'] or 0
+        total_amount_recovered = cls.objects.aggregate(Sum('amount_recovered'))['amount_recovered__sum'] or 0
+
+        return {
+            'total_complaints': total_complaints,
+            'total_closed_complaints': total_closed_complaints,
+            'total_fraud_amount': total_fraud_amount,
+            'total_amount_recovered': total_amount_recovered,
+        }
 
 class FIR(models.Model):
-    complain = models.OneToOneField(Complains, on_delete=models.CASCADE, primary_key=True, related_name='fir')
+    complain = models.ManyToManyField(Complains,related_name='firs')
     Date = models.DateTimeField(auto_now_add=True)
     fir_number = models.CharField(max_length=20)
     date_reported = models.DateTimeField(blank=True,null=True)
@@ -74,10 +91,10 @@ class OTP(models.Model):
         return raw_otp
 
     def is_valid(self):
-        expiration_time = timezone.now() - timezone.timedelta(minutes=3)
+        expiration_time = timezone.now() - timezone.timedelta(minutes=5)
         return self.created_at > expiration_time and self.is_active
     def calculate_time_to_expiry(self):
-        expiration_time = self.created_at + timezone.timedelta(minutes=3)
+        expiration_time = self.created_at + timezone.timedelta(minutes=5)
         return expiration_time - timezone.now()
 
 class Profile(models.Model):
@@ -97,3 +114,5 @@ class AdminActivity(models.Model):
 
 
 
+ # complain = models.OneToOneField(Complains, on_delete=models.CASCADE, primary_key=True, related_name='fir')
+    # complain = models.ForeignKey(Complains, on_delete=models.PROTECT, related_name='firs')

@@ -37,6 +37,9 @@ from io import BytesIO
 from django.db.models.functions import TruncMonth,TruncYear,TruncWeek,Lower
 from django import forms
 from django.utils.translation import gettext as _
+
+
+import io
 # from django_otp.decorators import otp_required
 # from two_factor.forms import AuthenticationTokenForm, BackupTokenForm
 
@@ -125,8 +128,8 @@ def complain_list_view(request):
 
     # Filter by status
     status = request.GET.get('status')
-    distinct_investigating_officers = Complains.objects.annotate(
-        lower_officer=Lower('investigating_officer')
+    distinct_enquiry_officers = Complains.objects.annotate(
+        lower_officer=Lower('enquiry_officer')
     ).values('lower_officer').distinct().values_list('lower_officer', flat=True)
 
     distinct_fraud_types = Complains.objects.annotate(
@@ -136,10 +139,10 @@ def complain_list_view(request):
         complains = complains.filter(status=status)
         print(status)
 
-    # Filter by investigating officer
-    investigating_officer = request.GET.get('investigating_officer')
-    if investigating_officer:
-        complains = complains.filter(investigating_officer__icontains=investigating_officer)
+    # Filter by enquiry officer
+    enquiry_officer = request.GET.get('enquiry_officer')
+    if enquiry_officer:
+        complains = complains.filter(enquiry_officer__icontains=enquiry_officer)
 
     # Filter by fraud type
     fraud_type = request.GET.get('fraud_type')
@@ -155,7 +158,9 @@ def complain_list_view(request):
             Q(mobile_number__icontains=search_query) |
             Q(ack_number__icontains=search_query) |
             Q(fraud_type__icontains=search_query) |
-            Q(investigating_officer__icontains=search_query)
+            Q(enquiry_officer__icontains=search_query)|
+            Q(address__icontains=search_query)|
+            Q(email__icontains=search_query)
         )
     complains = complains.order_by('-Date')
     designation = ""
@@ -171,7 +176,7 @@ def complain_list_view(request):
         'Complains': Complains,
         'status_choices': Complains._meta.get_field('status').choices,  
         'selected_status': status,
-        'distinct_investigating_officers': distinct_investigating_officers,
+        'distinct_enquiry_officers': distinct_enquiry_officers,
         'distinct_fraud_types': distinct_fraud_types,
         'search_query': search_query,
         'username':request.user.username,
@@ -184,7 +189,11 @@ def complain_create_view(request):
     if request.method == 'POST':
         form = ComplainForm(request.POST)
         if form.is_valid():
-            complain = form.save()
+            complain = form.save(commit=False)
+            if complain.status == 'closed':
+                complain.close_date = timezone.now()
+            complain.save()
+
             messages.success(request, f'Your complaint has been successfully submitted. Your acknowledgment number is {complain.ack_number}.')
             return redirect('add_complain')
         else:
@@ -273,8 +282,8 @@ def fir_list_view(request):
 
     # Filter by status
     # status = request.GET.get('status')
-    distinct_investigating_officers = Complains.objects.annotate(
-        lower_officer=Lower('investigating_officer')
+    distinct_enquiry_officers = Complains.objects.annotate(
+        lower_officer=Lower('enquiry_officer')
     ).values('lower_officer').distinct().values_list('lower_officer', flat=True)
 
     distinct_fraud_types = Complains.objects.annotate(
@@ -284,10 +293,10 @@ def fir_list_view(request):
     #     complains = complains.filter(status=status)
     #     print(status)
 
-    # Filter by investigating officer
-    investigating_officer = request.GET.get('investigating_officer')
-    if investigating_officer:
-        firs = firs.filter(complain__investigating_officer__icontains=investigating_officer)
+    # Filter by enquiry officer
+    enquiry_officer = request.GET.get('enquiry_officer')
+    if enquiry_officer:
+        firs = firs.filter(complain__enquiry_officer__icontains=enquiry_officer)
 
     # Filter by fraud type
     fraud_type = request.GET.get('fraud_type')
@@ -303,11 +312,13 @@ def fir_list_view(request):
             Q(complain__mobile_number__icontains=search_query) |
             Q(complain__ack_number__icontains=search_query) |
             Q(complain__fraud_type__icontains=search_query) |
-            Q(complain__investigating_officer__icontains=search_query)|
+            Q(complain__status__icontains=search_query) |
+            Q(complain__enquiry_officer__icontains=search_query)|
             Q(name_of_complainant__icontains=search_query)|
             Q(name_of_accused__icontains=search_query)|
+            Q(place_of_occurrence__icontains=search_query)|
             Q(fir_number__icontains=search_query)
-        )
+        ).distinct()
     firs = firs.order_by('-Date')
     designation = ""
     if is_super(request.user):
@@ -322,7 +333,7 @@ def fir_list_view(request):
         'Complains': Complains,
         # 'status_choices': Complains._meta.get_field('status').choices,  
         # 'selected_status': status,
-        'distinct_investigating_officers': distinct_investigating_officers,
+        'distinct_enquiry_officers': distinct_enquiry_officers,
         'distinct_fraud_types': distinct_fraud_types,
         'search_query': search_query,
         'username':request.user.username,
@@ -337,7 +348,8 @@ def fir_create_view(request):
         form = FIRForm(request.POST)
         if form.is_valid():
             fir = form.save()
-            messages.success(request,f'FIR {fir.fir_number} has been successfully created for the complain with acknowledgment number {fir.complain.ack_number}.')
+            complain_ack_numbers = ", ".join([complain.ack_number for complain in fir.complain.all()])
+            messages.success(request, f'FIR {fir.fir_number} has been successfully created for the complain(s) with acknowledgment number(s) {complain_ack_numbers}.')
             return redirect('add_fir')
         # else:
             # messages.error(request, 'There were some issues with your submission.')
@@ -803,26 +815,7 @@ def logout_handle(request):
     messages.success(request,'You have been successfully logged out.')
     return redirect(reverse_lazy('admin_login'))
 
-@login_required
-@user_passes_test(is_staff)
-def download_report(request, days):
-    end_date = timezone.now()
-    start_date = end_date - timezone.timedelta(days=int(days))
     
-    # Filter complains based on date range
-    complains = Complains.objects.filter(Date__range=(start_date, end_date))
-
-    # Create CSV file
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = f'attachment; filename="report_{days}_days.csv"'
-
-    writer = csv.writer(response)
-    writer.writerow(['Date', 'ack_number', 'name', 'status', 'fraud_type'])  
-    for complain in complains:
-        writer.writerow([complain.Date, complain.ack_number, complain.name, complain.status, complain.fraud_type])
-
-    return response
-
 @login_required
 @user_passes_test(is_staff)
 def download_excel(request, data_type):
@@ -860,7 +853,7 @@ def download_excel(request, data_type):
     ws = wb.active
     ws.title = data_type
 
-    headers = ["Ack Number", "Mobile Number", "Name", "Address", "Email", "Fraud Type", "Description","Accused Account Numbers","Accused Suspicious Items","Steps Taken", "Status", "Investigating Officer", "Files","Date"]
+    headers = ["Ack Number", "Mobile Number", "Name", "Address", "Email", "Fraud Type", "Description","Accused Account Numbers","Accused Suspicious Items","Fraudlent Amount(INR)","Amount Recovered(INR)","Steps Taken", "Status", "Enquiry Officer", "Files","Date"]
     ws.append(headers)
 
     for complain in data:
@@ -874,9 +867,11 @@ def download_excel(request, data_type):
             complain.description,
             complain.accusedAccountNumbers,
             complain.accusedSuspiciousItem,
+            complain.fraudlent_amount,
+            complain.amount_recovered,
             complain.steps_taken,
             complain.status,
-            complain.investigating_officer,
+            complain.enquiry_officer,
             complain.files,
             complain.Date.strftime('%Y-%m-%d %H:%M:%S'),
         ])
@@ -896,7 +891,7 @@ def download_excel(request, data_type):
 def download_fir(request):
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
-    investigating_officer = request.GET.get('investigating_officer')
+    enquiry_officer = request.GET.get('enquiry_officer')
     fraud_type = request.GET.get('fraud_type')
     search_query = request.GET.get('search')
     
@@ -913,8 +908,8 @@ def download_fir(request):
             firs = FIR.objects.all()
             print("Not Working")
         # firs = firs.filter(Date__range=[start_date, end_date])
-    if investigating_officer:
-        firs = firs.filter(complain__investigating_officer__icontains=investigating_officer)
+    if enquiry_officer:
+        firs = firs.filter(complain__enquiry_officer__icontains=enquiry_officer)
     if fraud_type:
         firs = firs.filter(complain__fraud_type__icontains=fraud_type)
     if search_query:
@@ -923,11 +918,11 @@ def download_fir(request):
             Q(complain__mobile_number__icontains=search_query) |
             Q(complain__ack_number__icontains=search_query) |
             Q(complain__fraud_type__icontains=search_query) |
-            Q(complain__investigating_officer__icontains=search_query)|
+            Q(complain__enquiry_officer__icontains=search_query)|
             Q(name_of_complainant__icontains=search_query)|
             Q(name_of_accused__icontains=search_query)|
             Q(fir_number__icontains=search_query)
-        )
+        ).distinct()
 
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="firs.csv"'
@@ -936,7 +931,7 @@ def download_fir(request):
         'Date', 'FIR Number', 'Date Reported',
         'Place of Occurrence', 'Distance', 'Direction', 'Date of Dispatch from PS',
         'Name of Complainant', 'Residence of Complainant', 'Name of Accused',
-        'Residence of Accused', 'Description', 'Section', 'Steps Taken by IO', 'Result of the Case'
+        'Residence of Accused', 'Description', 'Section', 'Steps Taken Regarding Investigation', 'Result of the Case'
     ])
 
 
@@ -954,3 +949,92 @@ def download_fir(request):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+# from django.template.loader import render_to_string
+# from reportlab.lib.pagesizes import A4
+# from reportlab.lib import colors
+# from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+# from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+# from reportlab.lib.units import inch
+# from reportlab.lib.enums import TA_CENTER, TA_LEFT
+# @login_required
+# @user_passes_test(is_staff)
+# def download_report(request):
+#     return generate_pdf_report()
+
+# def generate_pdf_report():
+    
+#     buffer = BytesIO()
+#     doc = SimpleDocTemplate(buffer, pagesize=A4)
+#     elements = []
+
+#     styles = getSampleStyleSheet()
+#     custom_styles = {
+#         'CenterTitle': ParagraphStyle(name='CenterTitle', alignment=TA_CENTER, fontSize=24, spaceAfter=20),
+#         'NormalLeft': ParagraphStyle(name='NormalLeft', alignment=TA_LEFT, fontSize=12, spaceAfter=12),
+#         'NormalCustom': ParagraphStyle(name='NormalCustom', fontSize=12, spaceAfter=12),
+#     }
+
+#     # Add title
+#     title = Paragraph("Complains Report", custom_styles['CenterTitle'])
+#     elements.append(title)
+
+#     # Add generated date
+#     generated_date = Paragraph(f"Generated on: {timezone.now().strftime('%Y-%m-%d %H:%M:%S')}", custom_styles['NormalLeft'])
+#     elements.append(generated_date)
+#     elements.append(Spacer(1, 12))
+
+#     # Add table with statistics
+#     statistics = Complains.get_statistics()
+#     data = [
+#         ['Metric', 'Value'],
+#         ['Total Complaints Registered', statistics['total_complaints']],
+#         ['Total Complaints Closed', statistics['total_closed_complaints']],
+#         ['Total Fraudulent Amount', f"₹{statistics['total_fraud_amount']:,.2f}"],
+#         ['Total Amount Recovered', f"₹{statistics['total_amount_recovered']:,.2f}"],
+#     ]
+
+#     table = Table(data, colWidths=[3 * inch, 3 * inch])
+#     table.setStyle(TableStyle([
+#         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#003366')),
+#         ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+#         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+#         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+#         ('FONTSIZE', (0, 0), (-1, 0), 14),
+#         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+#         ('BACKGROUND', (0, 1), (-1, -1), colors.whitesmoke),
+#         ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+#         ('GRID', (0, 0), (-1, -1), 1, colors.black),
+#     ]))
+#     elements.append(table)
+#     elements.append(Spacer(1, 20))
+
+#     # Add charts
+#     charts = create_charts()
+
+#     elements.append(Spacer(1, 12))
+#     fraud_vs_recovered_img = Image(charts['fraud_vs_recovered_path'], 6 * inch, 4 * inch)
+#     elements.append(fraud_vs_recovered_img)
+#     elements.append(Spacer(1, 20))
+
+#     elements.append(Spacer(1, 12))
+#     status_distribution_img = Image(charts['status_distribution_path'], 6 * inch, 4 * inch)  
+#     elements.append(status_distribution_img)
+#     elements.append(Spacer(1, 20))
+
+#     doc.build(elements)
+#     pdf = buffer.getvalue()
+#     buffer.close()
+#     response = HttpResponse(pdf, content_type='application/pdf')
+#     response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+#     return response

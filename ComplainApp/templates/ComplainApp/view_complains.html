@@ -116,12 +116,12 @@
             <input type="date" id="end_date" name="end_date" value="{{request.GET.end_date}}">
         </div>
         <div class="form-group">
-            <label for="investigating_officer">Investigating Officer:</label>
-            <select id="investigating_officer" name="investigating_officer">
+            <label for="enquiry_officer">Enquiry Officer:</label>
+            <select id="enquiry_officer" name="enquiry_officer">
                 <option value="">All</option>
-                {% for officer in distinct_investigating_officers %}
+                {% for officer in distinct_enquiry_officers %}
                 {% if officer is not None%}
-                <option value="{{ officer }}" {% if officer == request.GET.investigating_officer %}selected{% endif %}>{{ officer }}</option>
+                <option value="{{ officer }}" {% if officer == request.GET.enquiry_officer %}selected{% endif %}>{{ officer }}</option>
                 {% endif %}
                 {% endfor %}
             </select>
@@ -172,11 +172,13 @@
                         <th class="desc">Description</th>
                         <th class="acc-ac">Accused Accounts</th>
                         <th class="acc-item">Accused Suspicious Items</th>
+                        <th class="amt-f">Fraudlent Amount(INR)</th>
+                        <th class="amt-r">Amount Recovered(INR)</th>
                         <th class="steps">Steps Taken</th>
                         <th class="status">Status</th>
                         <th class="email">Email</th>
                         <th class="address">Address</th>
-                        <th class="io">Investigating Officer</th>
+                        <th class="io">Enquiry Officer</th>
                         <th class="file">Files</th>
                         
                         {% if is_superuser %}
@@ -201,12 +203,14 @@
                         <td class="desc">{{ complain.description}}</td>
                         <td class="acc-ac">{{ complain.accusedAccountNumbers}}</td>
                         <td class="acc-item">{{ complain.accusedSuspiciousItem}}</td>
+                        <td class="amt-f">{{ complain.fraudlent_amount}}</td>
+                        <td class="amt-r">{{ complain.amount_recovered}}</td>
                         <td>{{ complain.steps_taken }}</td>
                         <td>{{ complain.status }}</td>
                         <td class="email">{{ complain.email }}</td>
                         <td class="address">{{ complain.address }}</td>
-                        <td class="io">{{ complain.investigating_officer }}</td>
-                        <td class="io">{{ complain.files }}</td>
+                        <td class="io">{{ complain.enquiry_officer }}</td>
+                        <td>{{ complain.files }}</td>
                         
                       
                         {% if is_superuser %}

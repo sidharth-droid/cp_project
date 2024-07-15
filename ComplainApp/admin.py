@@ -7,21 +7,21 @@ from django.contrib.auth.admin import UserAdmin, GroupAdmin
 
 @admin.register(Complains)
 class ComplainsAdmin(admin.ModelAdmin):
-    list_display = ['Date','ack_number', 'name','mobile_number','address','fraud_type' ,'steps_taken','status','investigating_officer']
+    list_display = ['Date','ack_number', 'name','mobile_number','address','fraud_type' ,'steps_taken','status','enquiry_officer']
     search_fields = ['ack_number', 'name', 'mobile_number','email','steps_taken']
-    list_filter = ['status', 'fraud_type','investigating_officer']
+    list_filter = ['status', 'fraud_type','enquiry_officer']
     fieldsets = (
         (None, {
             'fields': ( 'name', 'mobile_number','address','email')
         }),
         ('Complaint Details', {
-            'fields': ('fraud_type', 'steps_taken', 'status','investigating_officer')
+            'fields': ('fraud_type', 'steps_taken', 'status','enquiry_officer')
         }),
        
     )
 @admin.register(FIR)
 class FIRAdmin(admin.ModelAdmin):
-    list_display=[field.name for field in FIR._meta.get_fields()]
+    # list_display=[field.name for field in FIR._meta.get_fields()]
     search_fields = ['ack_number','fir_number','name_of_complainant']
     fieldsets=(
         ('Complain Details', {

@@ -19,6 +19,7 @@
   form input[type="password"],
   form input[type="checkbox"],
   form input[type="url"],
+  form input[type="number"],
   /* form input[type="date"],
   form input[type="datetime-local"],
   form input[type="time"], */
@@ -30,6 +31,9 @@
       border-radius: var(--border-radius-2);
       border: 1px solid var(--color-dark-variant);
       box-sizing: border-box;
+  }
+  #id_fraud_type{
+    height: 45px;
   }
   form input[type="datetime-local"] {
       width: 100%;
@@ -240,8 +244,8 @@
           <label for="id_status">Status</label>
         </div>
         <div class="input-field">
-          <input type="text" id="id_investigating_officer" name="investigating_officer">
-          <label for="id_investigating_officer">Investigating Officer</label>
+          <input type="text" id="id_enquiry_officer" name="enquiry_officer">
+          <label for="id_enquiry_officer">enquiry Officer</label>
         </div>
         <button type="submit" class="btn waves-effect waves-light blue">Submit Complain</button>
       </form>

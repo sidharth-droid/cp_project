@@ -117,12 +117,12 @@
             <input type="date" id="end_date" name="end_date" value="{{request.GET.end_date}}">
         </div>
         <div class="form-group">
-            <label for="investigating_officer">Investigating Officer:</label>
-            <select id="investigating_officer" name="investigating_officer">
+            <label for="enquiry_officer">Investigating Officer:</label>
+            <select id="enquiry_officer" name="enquiry_officer">
                 <option value="">All</option>
-                {% for officer in distinct_investigating_officers %}
+                {% for officer in distinct_enquiry_officers %}
                 {% if officer is not None%}
-                <option value="{{ officer }}" {% if officer == request.GET.investigating_officer %}selected{% endif %}>{{ officer }}</option>
+                <option value="{{ officer }}" {% if officer == request.GET.enquiry_officer %}selected{% endif %}>{{ officer }}</option>
                 {% endif %}
                 {% endfor %}
             </select>
@@ -163,8 +163,8 @@
                 <thead>
                     <tr>
                         <th>Date</th>
-                        <th>Acknowledgement</th>
                         <th>FIR Number</th>
+                        <th>Acknowledgement</th>
                         <th>Date Reported</th>
                         <th>Place of Occurrence</th>
                         <th>Distance</th>
@@ -193,8 +193,12 @@
                     {% for fir in firs %}
                     <tr>
                         <td><a href="{% url 'edit_fir' fir.pk %}">{{ fir.Date }}</a></td>
-                        <td><a href="{% url 'edit_fir' fir.pk %}">{{ fir.complain.ack_number }}</a></td>
-                        <td>{{ fir.fir_number }}</td>
+                        <td><a href="{% url 'edit_fir' fir.pk %}">{{ fir.fir_number }}</a></td>
+                        <td>
+                            {% for complain in fir.complain.all %}
+                            <a href="{% url 'edit_complain' complain.pk %}">{{ complain.ack_number }}</a>{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </td>
                         <td>{{ fir.date_reported }}</td>
                         <td>{{ fir.place_of_occurrence }}</td>
                         <td>{{ fir.distance }}</td>
