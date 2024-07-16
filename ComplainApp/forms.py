@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import User, Group
 from django_select2.forms import Select2MultipleWidget
-
+from cloudinary.forms import CloudinaryFileField
 class ComplainsForm(forms.ModelForm):
     mobile_number = forms.CharField(help_text="Enter multiple mobile numbers separated by commas")
     class Meta:
@@ -28,8 +28,19 @@ class AdminLoginForm(forms.Form):
 class ComplainForm(forms.ModelForm):
     class Meta:
         model = Complains
-        fields = ['name','mobile_number','email','address','fraud_type','description','accusedAccountNumbers','accusedSuspiciousItem','fraudlent_amount','amount_recovered','steps_taken','status','files','enquiry_officer']
-      
+        
+        fields = ['name','mobile_number','email','address','fraud_type','description','suspect_account_numbers','suspect_emails','suspect_links','suspect_mobile_numbers','fraudlent_amount','amount_recovered','steps_taken','status','files','enquiry_officer']
+# class ComplainFileForm(forms.ModelForm):
+#     file = CloudinaryFileField()
+#     class Meta:
+#         model = ComplainFile
+#         fields = ['file']
+    # def __init__(self,*args,**kwargs):
+    #     super().__init__(*args,**kwargs)
+    #     self.fields['file'].options={
+    #         'tags':'new_image',
+            
+    #     }    
 class FIRForm(forms.ModelForm):
     # complain = forms.ModelChoiceField(queryset=Complains.objects.all(), empty_label="Select a Complain")
     # complain = forms.ModelChoiceField(queryset=Complains.objects.all(), empty_label="Select a Complain",widget=ModelSelect2Widget(model=Complains,search_fields=['name__icontains','mobile_number__icontains']))

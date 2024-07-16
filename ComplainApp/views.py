@@ -37,6 +37,9 @@ from io import BytesIO
 from django.db.models.functions import TruncMonth,TruncYear,TruncWeek,Lower
 from django import forms
 from django.utils.translation import gettext as _
+# from cloudinary.uploader import upload
+# from cloudinary.exceptions import Error
+# from cloudinary.forms import CloudinaryFileField
 
 
 import io
@@ -159,10 +162,16 @@ def complain_list_view(request):
             Q(ack_number__icontains=search_query) |
             Q(fraud_type__icontains=search_query) |
             Q(enquiry_officer__icontains=search_query)|
+            Q(suspect_account_numbers__icontains=search_query)|
+            Q(suspect_emails__icontains=search_query)|
+            Q(suspect_links__icontains=search_query)|
+            Q(suspect_mobile_numbers__icontains=search_query)|
             Q(address__icontains=search_query)|
             Q(email__icontains=search_query)
         )
     complains = complains.order_by('-Date')
+    # complains = complains.prefetch_related('files').order_by('-Date')
+
     designation = ""
     if is_super(request.user):
         designation = "Admin"
@@ -188,12 +197,19 @@ def complain_list_view(request):
 def complain_create_view(request):
     if request.method == 'POST':
         form = ComplainForm(request.POST)
+        # file_form = ComplainFileForm(request.POST, request.FILES)
         if form.is_valid():
             complain = form.save(commit=False)
             if complain.status == 'closed':
                 complain.close_date = timezone.now()
             complain.save()
+     
+            # files = request.FILES.getlist('file')
+            # for file in files:
+            #     logger.info(f"Uploading file: {file.name}")
 
+            #     ComplainFile.objects.create(complain=complain, file=file)
+            
             messages.success(request, f'Your complaint has been successfully submitted. Your acknowledgment number is {complain.ack_number}.')
             return redirect('add_complain')
         else:
@@ -202,6 +218,7 @@ def complain_create_view(request):
 
     else:
         form = ComplainForm()
+        # file_form = ComplainFileForm()
     designation = ""
     if is_super(request.user):
         designation = "Admin"
@@ -211,6 +228,7 @@ def complain_create_view(request):
         designation = "Member"
     context = {
         'form': form,
+        # 'file_form': file_form,
         # 'errors':form.errors,
         # 'attachments': attachments,
         'is_superuser': request.user.is_superuser,
@@ -853,7 +871,7 @@ def download_excel(request, data_type):
     ws = wb.active
     ws.title = data_type
 
-    headers = ["Ack Number", "Mobile Number", "Name", "Address", "Email", "Fraud Type", "Description","Accused Account Numbers","Accused Suspicious Items","Fraudlent Amount(INR)","Amount Recovered(INR)","Steps Taken", "Status", "Enquiry Officer", "Files","Date"]
+    headers = ["Ack Number", "Mobile Number", "Name", "Address", "Email", "Fraud Type", "Description","Suspect Account Numbers","Suspect Emails","Suspect Links","Suspect Phone Numbers","Fraudlent Amount(INR)","Amount Recovered(INR)","Steps Taken", "Status", "Enquiry Officer", "Files","Date"]
     ws.append(headers)
 
     for complain in data:
@@ -865,8 +883,10 @@ def download_excel(request, data_type):
             complain.email,
             complain.fraud_type,
             complain.description,
-            complain.accusedAccountNumbers,
-            complain.accusedSuspiciousItem,
+            complain.suspect_account_numbers,
+            complain.suspect_emails,
+            complain.suspect_links,
+            complain.suspect_mobile_numbers,
             complain.fraudlent_amount,
             complain.amount_recovered,
             complain.steps_taken,

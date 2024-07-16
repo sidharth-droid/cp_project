@@ -5,7 +5,7 @@ from django.utils.crypto import get_random_string
 from django.utils import timezone
 from django.db.models import Sum, Count
 import random,hashlib
-
+# from cloudinary.models import CloudinaryField
 class Complains(models.Model):
     Date = models.DateTimeField(auto_now_add=True)
     ack_number = models.CharField(max_length=20,primary_key=True)
@@ -14,11 +14,14 @@ class Complains(models.Model):
     address = models.TextField(blank=True)
     email = models.EmailField(blank=True, null=True)
     description = models.TextField(blank=True,null=True)
-    accusedAccountNumbers = models.TextField(blank=True,null=True)
-    accusedSuspiciousItem = models.TextField(blank=True,null=True)
+    suspect_account_numbers = models.TextField(blank=True,null=True)
+    suspect_emails = models.TextField(blank=True,null=True)
+    suspect_links = models.TextField(blank=True,null=True)
+    suspect_mobile_numbers = models.TextField(blank=True,null=True)
     fraud_type = models.TextField()
     steps_taken = models.TextField(blank=True,null=True)
     files = models.URLField(max_length=2000,db_index=True,blank=True,null=True)
+    # files = CloudinaryField('files',max_length=2000,blank=True,null=True)
     status = models.CharField(max_length=50, default='Verification Pending',choices=[('open','Open'),('in review','In Review'),('visit ps','Visit Police Station'),('in progress','In Progress'),('closed','Closed')])
     enquiry_officer = models.CharField(max_length=255,blank=True,null=True)
     fraudlent_amount = models.DecimalField(max_digits=20,decimal_places=2,default=0.00,blank=True)
@@ -55,7 +58,14 @@ class Complains(models.Model):
             'total_fraud_amount': total_fraud_amount,
             'total_amount_recovered': total_amount_recovered,
         }
-
+# class ComplainFile(models.Model):
+#     complain = models.ForeignKey(Complains, related_name='files', on_delete=models.CASCADE)
+#     file = CloudinaryField('file',max_length=2000)
+    # public_id = models.CharField(max_length=255, unique=True)
+    # def save(self, *args, **kwargs):
+    #     if not self.public_id:
+    #         self.public_id = self.file.public_id
+    #     super().save(*args, **kwargs)
 class FIR(models.Model):
     complain = models.ManyToManyField(Complains,related_name='firs')
     Date = models.DateTimeField(auto_now_add=True)

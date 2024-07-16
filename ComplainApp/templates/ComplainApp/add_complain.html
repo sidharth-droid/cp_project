@@ -3,6 +3,8 @@
 {% block name%}{{username}}{% endblock %}
 {% block desig%}{{designation}}{% endblock %}
 {% block content %}
+<!-- <script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript"></script> -->
+
 <style>
   /* *{
       appearance: unset;
@@ -131,9 +133,34 @@
         <form method="post">
           {% csrf_token %}
           {{ form.as_p }}
+          <!-- {{ file_form.as_p }} -->
+
           <button type="submit" class="btn btn-success">Save</button>
       </form>
  
+      <!-- <button id="upload_widget" class="cloudinary-button">Upload files</button>
+    
+    <script type="text/javascript">
+        var myWidget = cloudinary.createUploadWidget({
+            cloudName: 'dumxbi1vh',
+            uploadPreset: 'ni7lue9e'
+        }, (error, result) => {
+            if (!error && result && result.event === "success") {
+                console.log('Done! Here is the image info: ', result.info); 
+                
+                // Add the file URL to the form
+                const fileInput = document.createElement('input');
+                fileInput.type = 'hidden';
+                fileInput.name = 'file';
+                fileInput.value = result.info.secure_url;
+                document.querySelector('form').appendChild(fileInput);
+            }
+        });
+
+        document.getElementById("upload_widget").addEventListener("click", function() {
+            myWidget.open();
+        }, false);
+    </script> -->
 {% endblock %}
 
 

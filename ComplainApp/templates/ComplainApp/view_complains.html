@@ -170,8 +170,10 @@
                         <th class="mobile">Mobile</th>
                         <th class="fraud-type">Fraud Type</th>
                         <th class="desc">Description</th>
-                        <th class="acc-ac">Accused Accounts</th>
-                        <th class="acc-item">Accused Suspicious Items</th>
+                        <th class="acc-ac">Suspect Account Numbers</th>
+                        <th class="acc-ac">Suspect Emails</th>
+                        <th class="acc-ac">Suspect Links</th>
+                        <th class="acc-ac">Suspect Mobile Numbers</th>
                         <th class="amt-f">Fraudlent Amount(INR)</th>
                         <th class="amt-r">Amount Recovered(INR)</th>
                         <th class="steps">Steps Taken</th>
@@ -201,8 +203,10 @@
                         <td>{{ complain.mobile_number }}</td>
                         <td>{{ complain.fraud_type}}</td>
                         <td class="desc">{{ complain.description}}</td>
-                        <td class="acc-ac">{{ complain.accusedAccountNumbers}}</td>
-                        <td class="acc-item">{{ complain.accusedSuspiciousItem}}</td>
+                        <td class="acc-ac">{{ complain.suspect_account_numbers}}</td>
+                        <td class="acc-em">{{ complain.suspect_emails}}</td>
+                        <td class="acc-li">{{ complain.suspect_links}}</td>
+                        <td class="acc-mb">{{ complain.suspect_mobile_numbers}}</td>
                         <td class="amt-f">{{ complain.fraudlent_amount}}</td>
                         <td class="amt-r">{{ complain.amount_recovered}}</td>
                         <td>{{ complain.steps_taken }}</td>
@@ -210,9 +214,10 @@
                         <td class="email">{{ complain.email }}</td>
                         <td class="address">{{ complain.address }}</td>
                         <td class="io">{{ complain.enquiry_officer }}</td>
-                        <td>{{ complain.files }}</td>
-                        
-                      
+                        <td>
+                            {{complain.files}}
+                        </td>
+                    
                         {% if is_superuser %}
                         <td>
                             
