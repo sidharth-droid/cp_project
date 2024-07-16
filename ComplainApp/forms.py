@@ -29,7 +29,12 @@ class ComplainForm(forms.ModelForm):
     class Meta:
         model = Complains
         
-        fields = ['name','mobile_number','email','address','fraud_type','description','suspect_account_numbers','suspect_emails','suspect_links','suspect_mobile_numbers','fraudlent_amount','amount_recovered','steps_taken','status','files','enquiry_officer']
+        fields = ['name','mobile_number','email','address','fraud_type','description','suspect_account_numbers','suspect_emails','suspect_links','suspect_mobile_numbers','fraudlent_amount','amount_recovered','steps_taken','status','enquiry_officer','files']
+    def __init__(self, *args, **kwargs):
+        super(ComplainForm, self).__init__(*args, **kwargs)
+        if not self.instance.pk:
+            self.fields.pop('files')
+
 # class ComplainFileForm(forms.ModelForm):
 #     file = CloudinaryFileField()
 #     class Meta:

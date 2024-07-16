@@ -22,7 +22,7 @@ urlpatterns = [
     path('send_otp/', views.send_otp, name='send_otp'),
     path('verify_otp/', views.verify_otp, name='verify_otp'),
     path('resend_otp/', views.resend_otp, name='resend_otp'),
-
+    path('delete_file/', views.delete_file_view, name='delete_file'),
 
     path('admin/complains/', views.complain_list_view, name='view_complains'),
     path('admin/complains/add/', views.complain_create_view, name='add_complain'),

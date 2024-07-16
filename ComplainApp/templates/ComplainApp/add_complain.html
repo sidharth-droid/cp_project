@@ -3,7 +3,7 @@
 {% block name%}{{username}}{% endblock %}
 {% block desig%}{{designation}}{% endblock %}
 {% block content %}
-<!-- <script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript"></script> -->
+<script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript"></script>
 
 <style>
   /* *{
@@ -118,6 +118,27 @@
   .errorlist li {
       margin-bottom: 0.5rem;
   }
+  .upload-widget-button {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background-color: var(--color-primary);
+      color: var(--color-white);
+      border: none;
+      border-radius: var(--border-radius-2);
+      cursor: pointer;
+      font-weight: 700;
+      transition: background-color 0.3s ease;
+      margin: 1rem 0;
+      text-align: center;
+      text-decoration: none;
+  }
+  .upload-widget-button:hover {
+      background-color: #e800d1;
+  }
+  .upload-widget-button:focus {
+      outline: none;
+      box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.5);
+  }
 </style>
 <h1>Add New Complaint</h1>
 <div class="date"><input type="date" id="todaydate" value=""><span id="currentTime"></span></div>
@@ -133,11 +154,22 @@
         <form method="post">
           {% csrf_token %}
           {{ form.as_p }}
-          <!-- {{ file_form.as_p }} -->
-
+          <div id="upload_widget_opener" class="upload-widget-button">Upload Files[Images/Videos]</div>
+          <input type="hidden" id="file_urls" name="file_urls">
           <button type="submit" class="btn btn-success">Save</button>
       </form>
- 
+      <script type="text/javascript">
+        var uploadedFiles = [];
+        document.getElementById("upload_widget_opener").addEventListener("click", function () {
+            cloudinary.openUploadWidget({ cloudName: "dumxbi1vh", uploadPreset: "ni7lue9e", multiple: true },
+                function (error, result) {
+                    if (!error && result && result.event === "success") {
+                        uploadedFiles.push(result.info.secure_url);
+                        document.getElementById("file_urls").value = JSON.stringify(uploadedFiles);
+                    }
+                });
+        }, false);
+    </script>
       <!-- <button id="upload_widget" class="cloudinary-button">Upload files</button>
     
     <script type="text/javascript">

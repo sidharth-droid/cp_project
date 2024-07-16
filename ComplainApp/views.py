@@ -37,7 +37,11 @@ from io import BytesIO
 from django.db.models.functions import TruncMonth,TruncYear,TruncWeek,Lower
 from django import forms
 from django.utils.translation import gettext as _
-# from cloudinary.uploader import upload
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from cloudinary import CloudinaryImage
+
+from cloudinary.uploader import destroy
 # from cloudinary.exceptions import Error
 # from cloudinary.forms import CloudinaryFileField
 
@@ -45,7 +49,36 @@ from django.utils.translation import gettext as _
 import io
 # from django_otp.decorators import otp_required
 # from two_factor.forms import AuthenticationTokenForm, BackupTokenForm
+@csrf_exempt
+@require_POST
+def delete_file_view(request):
+    import json
+    data = json.loads(request.body)
+    file_url = data.get('file_url')
+    complain_id = data.get('complain_id')
+    
+    if not file_url or not complain_id:
+        return JsonResponse({'success': False, 'message': 'Invalid request.'})
 
+    complain = get_object_or_404(Complains, pk=complain_id)
+
+    if file_url in complain.files:
+        complain.files.remove(file_url)
+        complain.save()
+        return JsonResponse({'success': True})
+
+        # public_id = file_url.split('/')[-1].split('.')[0]
+        # print(public_id)
+        # Delete the file from Cloudinary
+        # try:
+        #     print("Here")
+        #     # CloudinaryImage(public_id).destroy()
+        #     destroy(public_id)
+        #     return JsonResponse({'success': True})
+        # except Exception as e:
+        #     return JsonResponse({'success': False, 'message': str(e)})
+    else:
+        return JsonResponse({'success': False, 'message': 'File not found.'})
 def session_invalidated(request):
     if request.user.is_authenticated:
         logout(request)
@@ -203,7 +236,10 @@ def complain_create_view(request):
             if complain.status == 'closed':
                 complain.close_date = timezone.now()
             complain.save()
-     
+            file_urls = request.POST.get('file_urls')
+            if file_urls:
+                complain.files = json.loads(file_urls)
+                complain.save()
             # files = request.FILES.getlist('file')
             # for file in files:
             #     logger.info(f"Uploading file: {file.name}")
@@ -249,6 +285,10 @@ def complain_update_view(request, pk):
             if instance.status == 'closed':
                 instance.close_date = timezone.now()
             instance.save()
+            file_urls = request.POST.get('file_urls')
+            if file_urls:
+                complain.files = json.loads(file_urls)
+                complain.save()
             # form.save()
             
             # messages.success(request, f'Your complaint has been successfully updated.')
