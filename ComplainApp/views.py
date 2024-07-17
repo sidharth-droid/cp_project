@@ -287,8 +287,8 @@ def complain_update_view(request, pk):
             instance.save()
             file_urls = request.POST.get('file_urls')
             if file_urls:
-                complain.files = json.loads(file_urls)
-                complain.save()
+                instance.files = json.loads(file_urls)
+                instance.save()
             # form.save()
             
             # messages.success(request, f'Your complaint has been successfully updated.')
