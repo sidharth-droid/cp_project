@@ -200,6 +200,7 @@ def complain_list_view(request):
             Q(suspect_links__icontains=search_query)|
             Q(suspect_mobile_numbers__icontains=search_query)|
             Q(address__icontains=search_query)|
+            Q(place_of_incidence__icontains=search_query)|
             Q(email__icontains=search_query)
         )
     complains = complains.order_by('-Date')
@@ -284,11 +285,13 @@ def complain_update_view(request, pk):
             instance = form.save(commit=False)
             if instance.status == 'closed':
                 instance.close_date = timezone.now()
-            instance.save()
+            
             file_urls = request.POST.get('file_urls')
             if file_urls:
-                instance.files = json.loads(file_urls)
+                new_files = json.loads(file_urls)
+                instance.files = instance.files+new_files
                 instance.save()
+            instance.save()
             # form.save()
             
             # messages.success(request, f'Your complaint has been successfully updated.')
@@ -911,7 +914,7 @@ def download_excel(request, data_type):
     ws = wb.active
     ws.title = data_type
 
-    headers = ["Ack Number", "Mobile Number", "Name", "Address", "Email", "Fraud Type", "Description","Suspect Account Numbers","Suspect Emails","Suspect Links","Suspect Phone Numbers","Fraudlent Amount(INR)","Amount Recovered(INR)","Steps Taken", "Status", "Enquiry Officer","Date"]
+    headers = ["Ack Number", "Mobile Number", "Name", "Address", "Email", "Place of Incidence","Fraud Type", "Description","Suspect Account Numbers","Suspect Emails","Suspect Links","Suspect Phone Numbers","Fraudlent Amount(INR)","Amount Recovered(INR)","Steps Taken", "Status", "Enquiry Officer","Date"]
     ws.append(headers)
 
     for complain in data:
@@ -921,6 +924,7 @@ def download_excel(request, data_type):
             complain.name,
             complain.address,
             complain.email,
+            complain.place_of_incidence,
             complain.fraud_type,
             complain.description,
             complain.suspect_account_numbers,

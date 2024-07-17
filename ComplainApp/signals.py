@@ -14,7 +14,7 @@ def set_ack_number(sender, instance, **kwargs):
     if not instance.ack_number:
         unique_ack = False
         while not unique_ack:
-            ack_number = get_random_string(length=20, allowed_chars=string.ascii_uppercase + string.digits)
+            ack_number = get_random_string(length=10, allowed_chars=string.ascii_uppercase + string.digits)
             if not Complains.objects.filter(ack_number=ack_number).exists():
                 unique_ack = True
                 instance.ack_number = ack_number

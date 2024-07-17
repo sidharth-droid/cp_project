@@ -212,9 +212,10 @@
                         <th class="status">Status</th>
                         <th class="email">Email</th>
                         <th class="address">Address</th>
+                        <th class="address">Place of Incidence</th>
                         <th class="io">Enquiry Officer</th>
                         <th class="file">Files</th>
-                        
+                        <th class="msg">Message</th>
                         {% if is_superuser %}
                         <th class="delete">Delete</th>
                         {% endif %}
@@ -245,6 +246,7 @@
                         <td>{{ complain.status }}</td>
                         <td class="email">{{ complain.email }}</td>
                         <td class="address">{{ complain.address }}</td>
+                        <td class="address">{{ complain.place_of_incidence }}</td>
                         <td class="io">{{ complain.enquiry_officer }}</td>
                         <td>
                             <ul>
@@ -259,7 +261,7 @@
                                 {% endfor %}
                             </ul>
                         </td>
-                    
+                        <td class="msg">{{complain.message}}</td>
                         {% if is_superuser %}
                         <td>
                             

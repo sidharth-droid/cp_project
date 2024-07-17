@@ -13,6 +13,7 @@ class Complains(models.Model):
     name = models.CharField(max_length=255)
     address = models.TextField(blank=True)
     email = models.EmailField(blank=True, null=True)
+    place_of_incidence = models.CharField(max_length=255,blank=True,null=True)
     description = models.TextField(blank=True,null=True)
     suspect_account_numbers = models.TextField(blank=True,null=True)
     suspect_emails = models.TextField(blank=True,null=True)
@@ -20,13 +21,13 @@ class Complains(models.Model):
     suspect_mobile_numbers = models.TextField(blank=True,null=True)
     fraud_type = models.TextField()
     steps_taken = models.TextField(blank=True,null=True)
-    # files = models.URLField(max_length=2000,db_index=True,blank=True,null=True)
     files = models.JSONField(blank=True,null=True,default=list)
-    # files = CloudinaryField('files',max_length=2000,blank=True,null=True)
     status = models.CharField(max_length=50, default='Verification Pending',choices=[('open','Open'),('in review','In Review'),('visit ps','Visit Police Station'),('in progress','In Progress'),('closed','Closed')])
     enquiry_officer = models.CharField(max_length=255,blank=True,null=True)
     fraudlent_amount = models.DecimalField(max_digits=20,decimal_places=2,default=0.00,blank=True)
     amount_recovered = models.DecimalField(max_digits=20,decimal_places=2,default=0.00,blank=True)
+    message = models.TextField(blank=True,null=True)
+    upload_status = models.BooleanField(default=False)
     close_date = models.DateTimeField(blank=True, null=True)
 
 
@@ -36,7 +37,7 @@ class Complains(models.Model):
         if not self.ack_number:
             unique_ack = False
             while not unique_ack:
-                ack_number = get_random_string(length=20, allowed_chars=string.ascii_uppercase + string.digits)
+                ack_number = get_random_string(length=10, allowed_chars=string.ascii_uppercase + string.digits)
                 if not Complains.objects.filter(ack_number=ack_number).exists():
                     unique_ack = True
                     self.ack_number = ack_number
