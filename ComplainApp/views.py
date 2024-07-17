@@ -911,7 +911,7 @@ def download_excel(request, data_type):
     ws = wb.active
     ws.title = data_type
 
-    headers = ["Ack Number", "Mobile Number", "Name", "Address", "Email", "Fraud Type", "Description","Suspect Account Numbers","Suspect Emails","Suspect Links","Suspect Phone Numbers","Fraudlent Amount(INR)","Amount Recovered(INR)","Steps Taken", "Status", "Enquiry Officer", "Files","Date"]
+    headers = ["Ack Number", "Mobile Number", "Name", "Address", "Email", "Fraud Type", "Description","Suspect Account Numbers","Suspect Emails","Suspect Links","Suspect Phone Numbers","Fraudlent Amount(INR)","Amount Recovered(INR)","Steps Taken", "Status", "Enquiry Officer","Date"]
     ws.append(headers)
 
     for complain in data:
@@ -932,7 +932,7 @@ def download_excel(request, data_type):
             complain.steps_taken,
             complain.status,
             complain.enquiry_officer,
-            complain.files,
+            # complain.files,
             complain.Date.strftime('%Y-%m-%d %H:%M:%S'),
         ])
 
