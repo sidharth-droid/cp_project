@@ -24,6 +24,7 @@ from .models import AdminActivity,Profile
 from .admin import AdminActivityAdmin
 from django.utils import timezone
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 from rest_framework.authtoken.models import Token
 import datetime,csv,hashlib
 from .forms import ComplainForm,CustomUserChangeForm,CustomUserCreationForm,FIRForm
@@ -121,6 +122,35 @@ class ComplainsList(generics.ListAPIView):
 class ComplaintDetail(generics.RetrieveUpdateAPIView):
     queryset = Complains.objects.all()
     serializer_class = ComplainsSerializer
+    def get_serializer(self, *args, **kwargs):
+        serializer_class = self.get_serializer_class()
+        kwargs['context'] = self.get_serializer_context()
+        
+        if self.request.method in ['PUT', 'PATCH']:
+            # Get the serializer instance with read-only fields dynamically set
+            serializer = serializer_class(*args, **kwargs)
+            for field_name, field in serializer.fields.items():
+                if field_name != 'files':
+                    field.read_only = True
+            return serializer
+
+        return serializer_class(*args, **kwargs)
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        
+        if 'files' not in request.data:
+            raise ValidationError({"error": "Only 'files' field can be updated."})
+        
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        
+        if 'files' in request.data:
+            instance.upload_status = False
+            instance.save()
+
+        return Response(serializer.data)
 class ComplainsCreate(generics.CreateAPIView):
     queryset = Complains.objects.all()
     serializer_class = ComplainsSerializer
@@ -276,7 +306,7 @@ def complain_create_view(request):
             api_data = json.dumps(api_data)
             print(api_data)
             try:
-                response = requests.post('http://3.109.200.108:4000/v1/api/enquire/save', data=api_data,headers={'Content-Type': 'application/json'})
+                response = requests.post('https://backendcp.subrat.xyz/v1/api/enquire/save', data=api_data,headers={'Content-Type': 'application/json'})
                 response.raise_for_status()
             except requests.exceptions.RequestException as e:
                 print("Issue with submitting to API: ",e)
