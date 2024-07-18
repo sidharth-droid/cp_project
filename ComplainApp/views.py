@@ -276,7 +276,7 @@ def complain_create_view(request):
                             body=f'''
                             Hello {complain.name},<br><br>
                             Your complaint has been successfully registered. Please keep your Acknowledgement Number <strong>{complain.ack_number}</strong> for future reference.<br><br>
-                            To check the status of your complaint, visit <strong><a href="http://3.109.200.108:3000/">www.cybercrimereporting.in</a></strong> .<br><br>
+                            To check the status of your complaint, visit <strong><a href="https://onlinecomplain.subrat.xyz/">www.cybercrimereporting.in</a></strong> .<br><br>
                             Thank you,<br>
                             Commissionerate of Police Orissa
                             ''',
