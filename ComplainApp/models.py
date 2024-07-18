@@ -13,7 +13,7 @@ class Complains(models.Model):
     name = models.CharField(max_length=255)
     address = models.TextField(blank=True)
     email = models.EmailField(blank=True, null=True)
-    place_of_incidence = models.CharField(max_length=255,blank=True,null=True)
+    place_of_incidence = models.TextField(blank=True,null=True)
     description = models.TextField(blank=True,null=True)
     suspect_account_numbers = models.TextField(blank=True,null=True)
     suspect_emails = models.TextField(blank=True,null=True)

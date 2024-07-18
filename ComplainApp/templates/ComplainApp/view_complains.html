@@ -126,6 +126,7 @@
         display: none;
     }    
 }
+
 </style>
 
 
@@ -197,7 +198,7 @@
                 <thead>
                     <tr>
                         <th class="dt">Date</th>
-                        <th class="ack-column">Ack</th>
+                        <th class="ack-column">Acknowledgement</th>
                         <th class="name">Name</th>
                         <th class="mobile">Mobile</th>
                         <th class="fraud-type">Fraud Type</th>
@@ -248,7 +249,7 @@
                         <td class="address">{{ complain.address }}</td>
                         <td class="address">{{ complain.place_of_incidence }}</td>
                         <td class="io">{{ complain.enquiry_officer }}</td>
-                        <td>
+                        <td class="file">
                             <ul>
                                 {% for file_url in complain.files %}
                                 <li>

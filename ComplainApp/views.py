@@ -27,7 +27,7 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 import datetime,csv,hashlib
 from .forms import ComplainForm,CustomUserChangeForm,CustomUserCreationForm,FIRForm
-from django.core.mail import send_mail
+from django.core.mail import send_mail,EmailMessage
 from .models import OTP
 from .forms import OTPForm
 import hashlib,os
@@ -118,7 +118,7 @@ class FIRDetail(generics.RetrieveAPIView):
 class ComplainsList(generics.ListAPIView):
     queryset = Complains.objects.all()
     serializer_class = ComplainsSerializer
-class ComplaintDetail(generics.RetrieveAPIView):
+class ComplaintDetail(generics.RetrieveUpdateAPIView):
     queryset = Complains.objects.all()
     serializer_class = ComplainsSerializer
 class ComplainsCreate(generics.CreateAPIView):
@@ -231,7 +231,6 @@ def complain_list_view(request):
 def complain_create_view(request):
     if request.method == 'POST':
         form = ComplainForm(request.POST)
-        # file_form = ComplainFileForm(request.POST, request.FILES)
         if form.is_valid():
             complain = form.save(commit=False)
             if complain.status == 'closed':
@@ -241,12 +240,46 @@ def complain_create_view(request):
             if file_urls:
                 complain.files = json.loads(file_urls)
                 complain.save()
-            # files = request.FILES.getlist('file')
-            # for file in files:
-            #     logger.info(f"Uploading file: {file.name}")
-
-            #     ComplainFile.objects.create(complain=complain, file=file)
-            
+            if complain.email:
+                email = EmailMessage(
+                            subject='Complaint Registration Confirmation',
+                            body=f'''
+                            Hello {complain.name},<br><br>
+                            Your complaint has been successfully registered. Please keep your Acknowledgement Number <strong>{complain.ack_number}</strong> for future reference.<br><br>
+                            To check the status of your complaint, visit <strong><a href="http://3.109.200.108:3000/">www.cybercrimereporting.in</a></strong> .<br><br>
+                            Thank you,<br>
+                            Commissionerate of Police Orissa
+                            ''',
+                            from_email='commissioneratepolice@gmail.com',
+                            to=[complain.email],
+                            headers={'From': 'Commissionerate Of Police Orissa commissioneratepolice@nic.in<commissioneratepolice@gmail.com>'}
+                        )
+                email.content_subtype = "html"
+                email.send(fail_silently=False)
+            suspicious_items = []
+            if complain.suspect_emails:
+                suspicious_items.append(complain.suspect_emails)
+            if complain.suspect_links:
+                suspicious_items.append(complain.suspect_links)
+            if complain.suspect_mobile_numbers:
+                suspicious_items.append(complain.suspect_mobile_numbers)
+            if complain.suspect_account_numbers:
+                suspicious_items.append(complain.suspect_account_numbers)
+            suspicious_items = ','.join(filter(None, suspicious_items))
+            api_data = {
+                "suspiciousItem": suspicious_items,
+                "name": complain.name,
+                "mobile_number": complain.mobile_number,
+                "address": complain.address,
+                "fraud_type": complain.description
+            }
+            api_data = json.dumps(api_data)
+            print(api_data)
+            try:
+                response = requests.post('http://3.109.200.108:4000/v1/api/enquire/save', data=api_data,headers={'Content-Type': 'application/json'})
+                response.raise_for_status()
+            except requests.exceptions.RequestException as e:
+                print("Issue with submitting to API: ",e)
             messages.success(request, f'Your complaint has been successfully submitted. Your acknowledgment number is {complain.ack_number}.')
             return redirect('add_complain')
         else:
@@ -279,12 +312,31 @@ def complain_create_view(request):
 @login_required
 def complain_update_view(request, pk):
     complain = get_object_or_404(Complains, pk=pk)
+    old_message = complain.message
     if request.method == 'POST':
         form = ComplainForm(request.POST, instance=complain)
         if form.is_valid():
             instance = form.save(commit=False)
             if instance.status == 'closed':
                 instance.close_date = timezone.now()
+            new_message = form.cleaned_data.get('message')
+            if old_message != new_message:
+                if instance.email:
+                    # send_mail(
+                    #     'Notification Regarding Your Complaint',
+                    #     f'There has been a message/update for your case with Acknowledgement {instance.ack_number}. Please check your complaint on the site for more details.',
+                    #     'commissioneratepolice@gmail.com',  # Replace with your from email address
+                    #     [instance.email],
+                    #     fail_silently=False,
+                    # )
+                    email = EmailMessage(
+                            subject='Notification Regarding Your Complaint',
+                            body=f'There has been a message or update for your case with Acknowledgement Number {instance.ack_number}. Please check your complaint on the site for more details.',
+                            from_email='commissioneratepolice@gmail.com',
+                            to=[instance.email],
+                            headers={'From': 'Commissionerate Of Police Orissa commissioneratepolice@nic.in<commissioneratepolice@gmail.com>'}
+                        )
+                    email.send(fail_silently=False)
             
             file_urls = request.POST.get('file_urls')
             if file_urls:
@@ -505,14 +557,22 @@ def get_pie_chart_data(request, time_range):
 def send_otp(request):
     otp = OTP.objects.create(user=request.user)
     raw_otp = otp.generate_otp()
-    send_mail(
-        'Your OTP Code',
-        f'Your OTP code is {raw_otp}',
-        'commissioneratepolice@gmail.com',
-        [request.user.email],
-        fail_silently=False,
+    # send_mail(
+    #     'Your OTP Code',
+    #     f'Your OTP code is {raw_otp}',
+    #     'commissioneratepolice@gmail.com',
+    #     [request.user.email],
+    #     fail_silently=False,
 
-    )
+    # )
+    email = EmailMessage(
+                            subject='OTP to Login to Admin Panel',
+                            body=f'Your OTP code is {raw_otp}',
+                            from_email='scamscamq@gmail.com',
+                            to=[request.user.email],
+                            headers={'From': 'Commissionerate Of Police Orissa commissioneratepolice@nic.in<commissioneratepolice@gmail.com>'}
+                        )
+    email.send(fail_silently=False)
     # return render(request, 'ComplainApp/otp_sent.html')
     return redirect('verify_otp')
 
