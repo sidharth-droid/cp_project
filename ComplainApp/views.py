@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics,views,response,status,permissions
 from .models import Complains,FIR
-from .serializers import ComplainsSerializer,FIRSerializer
+from .serializers import ComplainsSerializer
 import requests
 from django.http import HttpResponse,HttpResponseRedirect,JsonResponse
 from django.urls import reverse
@@ -21,7 +21,6 @@ from django.contrib.auth.models import User,Group,update_last_login
 from django.contrib.sessions.models import Session
 from django.contrib import admin,messages
 from .models import AdminActivity,Profile
-from .admin import AdminActivityAdmin
 from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
@@ -40,16 +39,7 @@ from django import forms
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from cloudinary import CloudinaryImage
-
-from cloudinary.uploader import destroy
-# from cloudinary.exceptions import Error
-# from cloudinary.forms import CloudinaryFileField
-
-
-import io
-# from django_otp.decorators import otp_required
-# from two_factor.forms import AuthenticationTokenForm, BackupTokenForm
+from .mixins import CheckAllowedOriginMixin
 @csrf_exempt
 @require_POST
 def delete_file_view(request):
@@ -67,17 +57,6 @@ def delete_file_view(request):
         complain.files.remove(file_url)
         complain.save()
         return JsonResponse({'success': True})
-
-        # public_id = file_url.split('/')[-1].split('.')[0]
-        # print(public_id)
-        # Delete the file from Cloudinary
-        # try:
-        #     print("Here")
-        #     # CloudinaryImage(public_id).destroy()
-        #     destroy(public_id)
-        #     return JsonResponse({'success': True})
-        # except Exception as e:
-        #     return JsonResponse({'success': False, 'message': str(e)})
     else:
         return JsonResponse({'success': False, 'message': 'File not found.'})
 def session_invalidated(request):
@@ -109,16 +88,6 @@ class LoginView(views.APIView):
             if session.session_key != current_session_key and session_data.get('_auth_user_id')== str(user.id):
                 session.delete()
 
-#Serializers Api Class
-class FIRList(generics.ListAPIView):
-    queryset = FIR.objects.all()
-    serializer_class = FIRSerializer
-class FIRDetail(generics.RetrieveAPIView):
-    queryset = FIR.objects.all()
-    serializer_class = FIRSerializer
-class ComplainsList(generics.ListAPIView):
-    queryset = Complains.objects.all()
-    serializer_class = ComplainsSerializer
 class ComplaintDetail(generics.RetrieveUpdateAPIView):
     queryset = Complains.objects.all()
     serializer_class = ComplainsSerializer
@@ -127,7 +96,6 @@ class ComplaintDetail(generics.RetrieveUpdateAPIView):
         kwargs['context'] = self.get_serializer_context()
         
         if self.request.method in ['PUT', 'PATCH']:
-            # Get the serializer instance with read-only fields dynamically set
             serializer = serializer_class(*args, **kwargs)
             for field_name, field in serializer.fields.items():
                 if field_name != 'files':
@@ -151,6 +119,7 @@ class ComplaintDetail(generics.RetrieveUpdateAPIView):
             instance.save()
 
         return Response(serializer.data)
+
 class ComplainsCreate(generics.CreateAPIView):
     queryset = Complains.objects.all()
     serializer_class = ComplainsSerializer
@@ -165,15 +134,12 @@ def AdminLogin(request):
             user = form.get_user()
             if user.is_superuser:
                 auth_login(request, user)
-                # invalidate_previous_sessions(user)
-                # return redirect('admin_dashboard')
                 return redirect('send_otp')
             elif user.is_staff and not user.is_superuser:
                 auth_login(request, user)
                 invalidate_previous_sessions(user)
                 return redirect('admin_dashboard')
 
-                # return redirect('two_factor:login')
             else:
                 messages.error(request, "You are not authorized to access the admin panel.")
         else:
@@ -234,7 +200,6 @@ def complain_list_view(request):
             Q(email__icontains=search_query)
         )
     complains = complains.order_by('-Date')
-    # complains = complains.prefetch_related('files').order_by('-Date')
 
     designation = ""
     if is_super(request.user):
@@ -318,7 +283,6 @@ def complain_create_view(request):
 
     else:
         form = ComplainForm()
-        # file_form = ComplainFileForm()
     designation = ""
     if is_super(request.user):
         designation = "Admin"
@@ -328,9 +292,6 @@ def complain_create_view(request):
         designation = "Member"
     context = {
         'form': form,
-        # 'file_form': file_form,
-        # 'errors':form.errors,
-        # 'attachments': attachments,
         'is_superuser': request.user.is_superuser,
         'username':request.user.username,
         'designation':designation
@@ -352,13 +313,6 @@ def complain_update_view(request, pk):
             new_message = form.cleaned_data.get('message')
             if old_message != new_message:
                 if instance.email:
-                    # send_mail(
-                    #     'Notification Regarding Your Complaint',
-                    #     f'There has been a message/update for your case with Acknowledgement {instance.ack_number}. Please check your complaint on the site for more details.',
-                    #     'commissioneratepolice@gmail.com',  # Replace with your from email address
-                    #     [instance.email],
-                    #     fail_silently=False,
-                    # )
                     email = EmailMessage(
                             subject='Notification Regarding Your Complaint',
                             body=f'There has been a message or update for your case with Acknowledgement Number {instance.ack_number}. Please check your complaint on the site for more details.',
@@ -374,10 +328,8 @@ def complain_update_view(request, pk):
                 instance.files = instance.files+new_files
                 instance.save()
             instance.save()
-            # form.save()
-            
-            # messages.success(request, f'Your complaint has been successfully updated.')
-            return redirect('view_complains')  # Adjust the success URL as needed
+           
+            return redirect('view_complains')
         else:
             messages.error(request, 'There were some issues with your submission.')
 
@@ -474,8 +426,6 @@ def fir_list_view(request):
         'firs': firs,
         'is_superuser': request.user.is_superuser,
         'Complains': Complains,
-        # 'status_choices': Complains._meta.get_field('status').choices,  
-        # 'selected_status': status,
         'distinct_enquiry_officers': distinct_enquiry_officers,
         'distinct_fraud_types': distinct_fraud_types,
         'search_query': search_query,
@@ -524,7 +474,7 @@ def fir_update_view(request, pk):
         if form.is_valid():
             form.save()
             # messages.success(request, f'Your complaint has been successfully updated.')
-            return redirect('view_fir')  # Adjust the success URL as needed
+            return redirect('view_fir')
         else:
             messages.error(request, 'There were some issues with your submission.')
 
@@ -555,33 +505,6 @@ def fir_delete_view(request, pk):
     else:
         return JsonResponse({'error': 'Method not allowed.'}, status=405)
     
-
-@login_required
-def get_pie_chart_data(request, time_range):
-    if time_range == 'lastYear':
-        start_date = datetime.datetime.now() - datetime.timedelta(days=365)
-    elif time_range == 'lastTwoYears':
-        start_date = datetime.datetime.now() - datetime.timedelta(days=730)
-    elif time_range == 'lastSixMonths':
-        start_date = datetime.datetime.now() - datetime.timedelta(days=182)
-    else:
-        start_date = None
-
-    if start_date:
-        complaints = Complains.objects.filter(Date__gte=start_date)
-    else:
-        complaints = Complains.objects.all()
-
-    data = complaints.values('status').annotate(count=Count('status'))
-    labels = [entry['status'] for entry in data]
-    counts = [entry['count'] for entry in data]
-
-    return JsonResponse({
-        'labels': labels,
-        'data': counts
-    })
-
-
 @login_required
 @user_passes_test(is_super)
 def send_otp(request):
@@ -731,13 +654,7 @@ def AdminDashboard(request):
         normalized_status = entry['status'].lower()
         if normalized_status in status_dict:
             status_dict[normalized_status] = entry['count']
-    # status_percentages = {entry['status']: (entry['count'] / total_cases) * 100 for entry in status_counts}
-    # status_percentages = {status: (count / total_cases1) * 100 for status, count in status_dict.items()}
-
-    # pie_chart_data = {
-    #     'labels': list(status_percentages.keys()),
-    #     'data': list(status_percentages.values())
-    # }
+    
     designation = ""
     if is_super(request.user):
         designation = "Admin"
@@ -749,8 +666,6 @@ def AdminDashboard(request):
         
     complains1 = complains.order_by('-Date')
     
-    # fraud_types_data = Complains.objects.values('fraud_type').annotate(count=Count('fraud_type'))
-    # fraud_types = [{'fraud_type': item['fraud_type'], 'count': item['count']} for item in fraud_types_data]
     context = {
         'total_cases': total_cases,
         'closed_cases': closed_cases,
@@ -759,12 +674,9 @@ def AdminDashboard(request):
         'complains':complains,
         'complains1':complains1,
         'chart_data': chart_data,
-        # 'pie_chart_data': pie_chart_data,
-        'start_date': start_date,  # Ensure the date is sent back to the template
+        'start_date': start_date,
         'end_date': end_date,
         'time_range': time_range,
-
-        # 'fraud_types': fraud_types,
         'is_superuser': request.user.is_superuser,
         'username':request.user.username,
         'designation':designation
@@ -1098,97 +1010,3 @@ def download_fir(request):
         ])
     return response
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# from django.template.loader import render_to_string
-# from reportlab.lib.pagesizes import A4
-# from reportlab.lib import colors
-# from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-# from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
-# from reportlab.lib.units import inch
-# from reportlab.lib.enums import TA_CENTER, TA_LEFT
-# @login_required
-# @user_passes_test(is_staff)
-# def download_report(request):
-#     return generate_pdf_report()
-
-# def generate_pdf_report():
-    
-#     buffer = BytesIO()
-#     doc = SimpleDocTemplate(buffer, pagesize=A4)
-#     elements = []
-
-#     styles = getSampleStyleSheet()
-#     custom_styles = {
-#         'CenterTitle': ParagraphStyle(name='CenterTitle', alignment=TA_CENTER, fontSize=24, spaceAfter=20),
-#         'NormalLeft': ParagraphStyle(name='NormalLeft', alignment=TA_LEFT, fontSize=12, spaceAfter=12),
-#         'NormalCustom': ParagraphStyle(name='NormalCustom', fontSize=12, spaceAfter=12),
-#     }
-
-#     # Add title
-#     title = Paragraph("Complains Report", custom_styles['CenterTitle'])
-#     elements.append(title)
-
-#     # Add generated date
-#     generated_date = Paragraph(f"Generated on: {timezone.now().strftime('%Y-%m-%d %H:%M:%S')}", custom_styles['NormalLeft'])
-#     elements.append(generated_date)
-#     elements.append(Spacer(1, 12))
-
-#     # Add table with statistics
-#     statistics = Complains.get_statistics()
-#     data = [
-#         ['Metric', 'Value'],
-#         ['Total Complaints Registered', statistics['total_complaints']],
-#         ['Total Complaints Closed', statistics['total_closed_complaints']],
-#         ['Total Fraudulent Amount', f"₹{statistics['total_fraud_amount']:,.2f}"],
-#         ['Total Amount Recovered', f"₹{statistics['total_amount_recovered']:,.2f}"],
-#     ]
-
-#     table = Table(data, colWidths=[3 * inch, 3 * inch])
-#     table.setStyle(TableStyle([
-#         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#003366')),
-#         ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-#         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-#         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-#         ('FONTSIZE', (0, 0), (-1, 0), 14),
-#         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-#         ('BACKGROUND', (0, 1), (-1, -1), colors.whitesmoke),
-#         ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
-#         ('GRID', (0, 0), (-1, -1), 1, colors.black),
-#     ]))
-#     elements.append(table)
-#     elements.append(Spacer(1, 20))
-
-#     # Add charts
-#     charts = create_charts()
-
-#     elements.append(Spacer(1, 12))
-#     fraud_vs_recovered_img = Image(charts['fraud_vs_recovered_path'], 6 * inch, 4 * inch)
-#     elements.append(fraud_vs_recovered_img)
-#     elements.append(Spacer(1, 20))
-
-#     elements.append(Spacer(1, 12))
-#     status_distribution_img = Image(charts['status_distribution_path'], 6 * inch, 4 * inch)  
-#     elements.append(status_distribution_img)
-#     elements.append(Spacer(1, 20))
-
-#     doc.build(elements)
-#     pdf = buffer.getvalue()
-#     buffer.close()
-#     response = HttpResponse(pdf, content_type='application/pdf')
-#     response['Content-Disposition'] = 'attachment; filename="report.pdf"'
-#     return response

@@ -1,10 +1,9 @@
 from django import forms
 from .models import Complains,FIR
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
-from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django_select2.forms import Select2MultipleWidget
-from cloudinary.forms import CloudinaryFileField
+
 class ComplainsForm(forms.ModelForm):
     mobile_number = forms.CharField(help_text="Enter multiple mobile numbers separated by commas")
     class Meta:
@@ -35,20 +34,8 @@ class ComplainForm(forms.ModelForm):
         if not self.instance.pk:
             self.fields.pop('files')
 
-# class ComplainFileForm(forms.ModelForm):
-#     file = CloudinaryFileField()
-#     class Meta:
-#         model = ComplainFile
-#         fields = ['file']
-    # def __init__(self,*args,**kwargs):
-    #     super().__init__(*args,**kwargs)
-    #     self.fields['file'].options={
-    #         'tags':'new_image',
-            
-    #     }    
+   
 class FIRForm(forms.ModelForm):
-    # complain = forms.ModelChoiceField(queryset=Complains.objects.all(), empty_label="Select a Complain")
-    # complain = forms.ModelChoiceField(queryset=Complains.objects.all(), empty_label="Select a Complain",widget=ModelSelect2Widget(model=Complains,search_fields=['name__icontains','mobile_number__icontains']))
     complain = forms.ModelMultipleChoiceField(
         queryset=Complains.objects.all(),
         widget=Select2MultipleWidget,
@@ -76,20 +63,7 @@ class FIRForm(forms.ModelForm):
     def clean_complain(self):
         selected_complains = self.cleaned_data['complain']
         ack_numbers = [complain.ack_number for complain in selected_complains]
-        # ack_numbers = ""
-        # for complain in selected_complains:
-        #     ack_numbers+=complain.ack_number
         return ack_numbers
-    # def save(self, commit=True):
-    #     # Override save method if needed
-    #     instance = super().save(commit=False)
-    #     if commit:
-    #         instance.save()
-    #     return instance
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     self.fields['complain'].label_from_instance = lambda obj: obj.Date
-        
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=False)
     is_active = forms.BooleanField(required=False, initial=True, label="Active")

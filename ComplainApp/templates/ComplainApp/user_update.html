@@ -3,6 +3,7 @@
 {% block name %}{{ username }}{% endblock %}
 {% block desig %}{{ designation }}{% endblock %}
 {% block content %}
+
 <style>
     form {
     margin-top: 1rem;
@@ -45,7 +46,6 @@ form button {
 }
 
 form button:hover {
-    /* background-color: var(--color-primary); */
     background: #e800d1;
 }
 ul{
@@ -70,6 +70,7 @@ ul{
         margin-bottom: 0.5rem;
     }
 </style>
+
 <h1>Update User</h1>
 <div class="date">
     <input type="date" id="todaydate" value="">
@@ -80,7 +81,6 @@ ul{
         {% csrf_token %}
         {{ form.as_p }}
 
-        <!-- Additional fields if needed -->
         <button type="submit" class="btn btn-success">Save Changes</button>
     </form>
 
@@ -91,6 +91,6 @@ ul{
 
         <button type="submit" class="btn btn-primary">Change Password</button>
     </form>
-    <!-- <a href="{% url 'user_list' %}" class="btn btn-secondary mt-3">Back to List</a> -->
 </div>
+
 {% endblock %}

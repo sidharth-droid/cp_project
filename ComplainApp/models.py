@@ -5,7 +5,7 @@ from django.utils.crypto import get_random_string
 from django.utils import timezone
 from django.db.models import Sum, Count
 import random,hashlib
-# from cloudinary.models import CloudinaryField
+
 class Complains(models.Model):
     Date = models.DateTimeField(auto_now_add=True)
     ack_number = models.CharField(max_length=20,primary_key=True)
@@ -60,14 +60,7 @@ class Complains(models.Model):
             'total_fraud_amount': total_fraud_amount,
             'total_amount_recovered': total_amount_recovered,
         }
-# class ComplainFile(models.Model):
-#     complain = models.ForeignKey(Complains, related_name='files', on_delete=models.CASCADE)
-#     file = CloudinaryField('file',max_length=2000)
-    # public_id = models.CharField(max_length=255, unique=True)
-    # def save(self, *args, **kwargs):
-    #     if not self.public_id:
-    #         self.public_id = self.file.public_id
-    #     super().save(*args, **kwargs)
+
 class FIR(models.Model):
     complain = models.ManyToManyField(Complains,related_name='firs')
     Date = models.DateTimeField(auto_now_add=True)
@@ -122,9 +115,3 @@ class AdminActivity(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.login_time}"
     
-
-
-
-
- # complain = models.OneToOneField(Complains, on_delete=models.CASCADE, primary_key=True, related_name='fir')
-    # complain = models.ForeignKey(Complains, on_delete=models.PROTECT, related_name='firs')

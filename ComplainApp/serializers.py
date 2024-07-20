@@ -1,11 +1,5 @@
 from rest_framework import serializers
-from .models import Complains,FIR
-
-class FIRSerializer(serializers.ModelSerializer):
-    class Meta:
-        model=FIR
-        fields = '__all__'
-
+from .models import Complains
 class ComplainsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Complains

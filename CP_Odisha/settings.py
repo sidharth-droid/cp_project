@@ -13,25 +13,19 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 import os
 import dj_database_url
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 LOGIN_URL = '/ComplainApp/admin/login/'
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = str(os.environ.get('DEBUG')) == '1'
 
 
 ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
-# CORS_ALLOWED_ORIGINS = [
-#     'http://localhost:5173',
-# ]
+CORS_ALLOWED_ORIGINS = [
+    "https://onlinecomplain.subrat.xyz"
+]
 
 # Application definition
 
@@ -39,7 +33,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'ComplainApp',
-    'ComplainApp.templatetags',
     'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -86,28 +79,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'CP_Odisha.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-# DATABASES = {
-#     # 'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
-#     'default': {
-#         'ENGINE': os.environ.get('DB_ENGINE'),
-#         'NAME': os.environ.get('DB_NAME'),
-#         'USER': os.environ.get('DB_USER'),
-#         'PASSWORD': os.environ.get('DB_PASS'),
-#         'HOST': os.environ.get('DB_HOST'),
-#         'PORT': os.environ.get('DB_PORT')
-#         }
-# }
 DATABASES = {
-    # 'default':dj_database_url.parse("postgresql://cp_db_6ktr_user:6gybEZcIvne2XsIFET7I310S9A3ATljJ@dpg-cq78pdlds78s738srnt0-a.oregon-postgres.render.com/cp_db_6ktr")
     'default':dj_database_url.parse("postgresql://cp_database_user:Y5tVfGLosZw3tV6nOufoiS5Uh3YS4HAn@dpg-cqa1lfbv2p9s73cq58dg-a.oregon-postgres.render.com/cp_database")
 }
 

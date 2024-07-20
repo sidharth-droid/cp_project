@@ -6,14 +6,9 @@ from . import views
 urlpatterns = [
     path('admin/download/<str:data_type>/', views.download_excel, name='download_excel'),
     path('admin/download_fir/', views.download_fir, name='download_fir'),
-    # path('admin/download_report/', views.download_report, name='download_report'),
 
-    path('api/complains/',views.ComplainsList.as_view(),name='complains-list'),
     path('api/complains/<str:pk>/',views.ComplaintDetail.as_view(),name='complain-detail'),
     path('api/complains/create/new/',views.ComplainsCreate.as_view(),name='complain-create'),
-
-    path('api/fir/',views.FIRList.as_view(),name='fir-list'),
-    path('api/fir/<str:pk>',views.FIRDetail.as_view(),name='fir-detail'),
     
 
     path('admin/login/',views.AdminLogin,name='admin_login'),
@@ -48,20 +43,3 @@ urlpatterns = [
     
    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-
-# -------Unused Routes-----------
-
-    # path('admin/complains/', views.view_complains, name='view_complains'),
-    # path('admin/complains/add/', views.add_complain, name='add_complain'),
-    # path('admin/complains/edit/<int:complain_id>/', views.edit_complain, name='edit_complain'),
-    # path('admin/complains/delete/<int:complain_id>/', views.delete_complain, name='delete_complain'),
-    # path('admin/groups/', views.group_list_view, name='group_list'),
-    # path('admin/groups/create/', views.group_create_view, name='group_create'),
-    # path('admin/groups/update/<int:group_id>/', views.group_update_view, name='group_update'),
-    # path('admin/groups/delete/<int:group_id>/', views.group_delete_view, name='group_delete'),
-    # path('api/link/<str:url>',views.LinkDetail.as_view(),name='link-detail'),
-    # path('api/phone/<str:number>',views.PhoneDetail.as_view(),name='phone-detail'),
-    # path('api/email/<str:email>',views.EmailDetail.as_view(),name='email-detail'),
-    # path('api/login',views.LoginView.as_view(),name='login'),
-    # path('admin/get_pie_chart_data/<str:time_range>/', views.get_pie_chart_data, name='get_pie_chart_data'),
