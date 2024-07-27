@@ -192,11 +192,10 @@
         <div class="form-group status">
             <label for="status" id="s-label">Status:</label>
             <select id="status" name="status">
-                <option value="">All</option>
+                <option value="" selected>All</option>
                 {% for value, label in status_choices %}
                 <option value="{{ value }}" {% if value == selected_status %}selected{% endif %}>{{ label }}</option>
-                {% endfor %}
-                <option value="Verification Pending" {% if value == selected_status %}selected{% endif %}>Verification Pending</option>
+                {% endfor %}                
             </select>
         </div>
         <div class="filset">

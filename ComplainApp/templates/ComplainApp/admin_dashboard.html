@@ -9,12 +9,10 @@
 {% block desig %}{{ designation }}{% endblock %}
 {% block content %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
-<!-- <script src="{% static 'js/theme.js' %}"></script> -->
 <style>
     .download-btn {
         padding: 10px 20px;
         background-color: #4CAF50;
-        /* Green */
         border: none;
         color: white;
         text-align: center;
@@ -247,26 +245,10 @@
 
             </div>
 
-
-
-
-
-
         </div>
 
     </div>
-    <!-- <div class="pending">
-                    <span class="material-icons-sharp">analytics</span>
-                    <div class="middle">
-                        <div class="left">
-                            <h3>Pending Cases</h3>
-                            <h1>{{pending_cases}}</h1>
-                            <button class="download-btn3 download-btn" onclick="downloadData('pending')">Download</button>
-                        </div>
-
-                    </div> -->
-
-    <!-- </div> -->
+    
 
 </div>
 <div class="graph1">
@@ -426,157 +408,3 @@
 
 </script>
 {% endblock %}
-
-
-
-
-
-<!-- var pieChartData = {{ pie_chart_data|safe }};
-        var ctxPie = document.getElementById('statusPieChart').getContext('2d');
-        var customLabels = [
-            'Open',
-            'In Review',
-            'Visit Police Station',
-            'In Progress',
-            'Closed (Reach out to Police Station)'
-        ];
-        var statusPieChart = new Chart(ctxPie, {
-            type: 'pie',
-        data: {
-                labels: customLabels,
-                datasets: [{
-                    data: pieChartData.data,
-                    backgroundColor: [
-                        '#FF6384', // Red
-                        '#36A2EB', // Blue
-                        '#FFCE56', // Yellow
-                        '#4BC0C0', // Teal
-                        '#9966FF', // Purple
-                        '#FF9F40'  // Orange
-                    ],
-                    
-                    borderColor: [
-                        'white',
-                        'white',
-                        'white',
-                        'white',
-                        'white',
-                        'white',
-                        
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(tooltipItem) {
-                                var label = pieChartData.labels[tooltipItem.dataIndex] || '';
-                                var value = pieChartData.data[tooltipItem.dataIndex] || 0;
-                                return label + ': ' + value.toFixed(2) + '%';
-                            }
-                        }
-                    },
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            usePointStyle: true,
-                            pointStyle: 'circle',
-                            padding: 10
-                        }
-                    },
-                    title: {
-                        display: true,
-                        text: 'Case Status Distribution',
-                        font: {
-                            size: 18,
-                            color: 'black'
-                        }
-                    }
-                }
-            }
-        }); -->
-
-<!-- //     data: {
-    //         labels: pieChartData.labels,
-    //         datasets: [{
-    //             data: pieChartData.data,
-    //             backgroundColor: [
-    //                 'rgba(255, 99, 132, 0.2)',
-    //                 'rgba(54, 162, 235, 0.2)',
-    //                 'rgba(255, 206, 86, 0.2)',
-    //                 'rgba(75, 192, 192, 0.2)',
-    //                 'rgba(153, 102, 255, 0.2)',
-    //                 'rgba(255, 159, 64, 0.2)'
-    //             ],
-    //             borderColor: [
-    //                 'rgba(255, 99, 132, 1)',
-    //                 'rgba(54, 162, 235, 1)',
-    //                 'rgba(255, 206, 86, 1)',
-    //                 'rgba(75, 192, 192, 1)',
-    //                 'rgba(153, 102, 255, 1)',
-    //                 'rgba(255, 159, 64, 1)'
-    //             ],
-    //             borderWidth: 2
-    //         }]
-    //     },
-    //     options: {
-    //         responsive: true
-    //     }
-    // }); -->
-
-<!-- // window.location.href = `http://127.0.0.1:8000/ComplainApp/admin/download/${dataType}`; -->
-
-<!-- //     document.getElementById('timeRange').addEventListener('change', function() {
-    // let selectedRange = this.value;
-    // fetchPieChartData(selectedRange).then(updatedData => {
-    //     statusPieChart.data.labels = updatedData.labels;
-    //     statusPieChart.data.datasets[0].data = updatedData.data;
-    //     statusPieChart.update();
-    // });
-// }); -->
-
-<!-- <div class="updates">
-                    <div class="update">
-                        <div class="profile-photo">
-                            <img src="profile_image.jpg" alt="">
-                        </div>
-                        <div class="messages">
-                            <p><b>Aryan Dash</b> Added ack number 4</p>
-                            <div class="text-muted">2 Minutes Ago</div>
-                        </div>
-                    </div>
-                    <div class="update">
-                        <div class="profile-photo">
-                            <img src="profile_image.jpg" alt="">
-                        </div>
-                        <div class="messages">
-                            <p><b>Aryan Dash</b>added ack number 4</p>
-                            <div class="text-muted">2 Minutes Ago</div>
-                        </div>
-                    </div>
-                    <div class="update">
-                        <div class="profile-photo">
-                            <img src="profile_image.jpg" alt="">
-                        </div>
-                        <div class="messages">
-                            <p><b>Aryan Dash</b>added ack number 4</p>
-                            <div class="text-muted">2 Minutes Ago</div>
-                        </div>
-                    </div>
-                    <div class="update">
-                        <div class="profile-photo">
-                            <img src="profile_image.jpg" alt="">
-                        </div>
-                        <div class="messages">
-                            <p><b>Aryan Dash</b>added ack number 4</p>
-                            <div class="text-muted">2 Minutes Ago</div>
-                        </div> -->
-
-<!-- </div> -->
-
-<!-- </div> -->
-
-<!-- </div> -->

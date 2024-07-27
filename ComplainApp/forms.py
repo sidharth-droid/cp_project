@@ -4,16 +4,11 @@ from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.contrib.auth.models import User
 from django_select2.forms import Select2MultipleWidget
 
-class ComplainsForm(forms.ModelForm):
-    mobile_number = forms.CharField(help_text="Enter multiple mobile numbers separated by commas")
-    class Meta:
-        model = Complains
-        fields = ['ack_number','mobile_number','name','address','email','fraud_type','steps_taken','status','enquiry_officer']
-    def clean_mobile(self):
-        mobile_numbers = self.cleaned_data['mobile_number']
-        return mobile_numbers
+
 class OTPForm(forms.Form):
     otp = forms.CharField(max_length=6, required=True)
+
+
 class AdminLoginForm(forms.Form):
     username=forms.CharField(max_length=150,widget=forms.TextInput(attrs={
         'class':'validate',
@@ -24,10 +19,10 @@ class AdminLoginForm(forms.Form):
         'placeholder': 'Password'
     }))
 
+
 class ComplainForm(forms.ModelForm):
     class Meta:
-        model = Complains
-        
+        model = Complains 
         fields = ['name','mobile_number','email','address','fraud_type','description','place_of_incidence','suspect_account_numbers','suspect_emails','suspect_links','suspect_mobile_numbers','fraudlent_amount','amount_recovered','steps_taken','status','enquiry_officer','message','upload_status','files']
     def __init__(self, *args, **kwargs):
         super(ComplainForm, self).__init__(*args, **kwargs)
@@ -64,6 +59,8 @@ class FIRForm(forms.ModelForm):
         selected_complains = self.cleaned_data['complain']
         ack_numbers = [complain.ack_number for complain in selected_complains]
         return ack_numbers
+    
+
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=False)
     is_active = forms.BooleanField(required=False, initial=True, label="Active")

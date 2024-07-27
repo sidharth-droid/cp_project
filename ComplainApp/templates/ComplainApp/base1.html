@@ -9,6 +9,273 @@
     {% block extra_css %}{% endblock %}
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <style>
+
+aside{
+    height: 100vh;
+    top: 5rem;}
+aside .top{
+    display: flex;
+    align-items:center;
+    justify-content: space-between;
+    margin-top: 1.4rem;
+}
+aside .logo{
+    display: flex;
+    gap:0.8rem
+}
+aside .logo img{
+    width: 2rem;
+    height: 2rem;
+}
+aside .close{
+    display: none;
+}
+
+aside.sidebar{
+    background: white;
+    display: flex;
+    flex-direction: column;
+    height:86vh;
+    position: relative;
+    top:3rem;
+}
+aside h3{
+    font-weight: 500;}
+
+aside .sidebar a{
+    display:flex;
+    color: var(--color-info-dark);
+    margin-left: 2rem;
+    gap:1rem;
+    align-items:center;
+    position: relative;
+    height: 3.7rem;
+    transition: all 300ms ease;}
+
+aside .sidebar a svg{
+    /* background-color: var(--color-icon); */
+    fill: var(--color-icon);
+    border-radius: 6px;
+    transition: all 300ms ease;
+}
+aside .sidebar a:last-child{
+    position: absolute;
+    bottom: 2rem;
+    width: 10%;
+}
+aside .sidebar a.active{
+    background: var(--color-light);
+    color:var(--color-primary);
+    margin-left: 0;
+}
+
+aside .sidebar a.active:before{
+    content: "";
+    width:6px;
+    height: 100%;
+    background: var(--color-primary);
+}
+aside .sidebar a.active svg{
+    fill: var(--color-primary);
+    margin-left: calc(0rem - 3px);}
+
+aside .sidebar a:hover{
+    color: var(--color-primary);
+}
+aside .sidebar a:hover svg{
+    fill: var(--color-primary);
+    margin-left: 0.1rem;
+}
+
+
+.theme-toggler{
+    background: var(--color-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 1.9rem;
+    width: 5.2rem;
+    cursor: pointer;
+    border-radius: var(--border-radius-1);
+}
+
+.theme-toggler span{
+    font-size: 1.2rem;
+    width: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-toggler span.active{
+    background: var(--color-primary);
+    color: white;
+    border-radius: var(--border-radius-1);
+}
+
+.top-nav {
+    display: flex;
+    justify-content:space-between;
+    align-items: center;
+    background-color: var(--color-background);
+    padding: 0.5rem 1rem;
+    position: fixed;
+    width: auto;
+    right: 1rem;
+    top: 1rem;
+    /* left: 0; */
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 1rem;
+    height: 50px;
+}
+
+.top-nav .theme-toggler {
+    display: flex;
+    align-items: center;
+    gap: 0rem;
+    margin-right: 2rem;
+}
+
+.top-nav .theme-toggler span {
+    cursor: pointer;
+    font-size: 1.5rem;
+    margin-left: 1rem;
+}
+
+.top-nav .profile .info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-right: 1rem;
+}
+
+.top-nav .profile .info p {
+    margin: 0;
+    
+}
+
+.top-nav .profile .info small {
+    color: var(--color-info-dark);
+}
+
+.top-nav .b1 button{
+    display: none;
+    background:transparent;
+    cursor: pointer;
+    color: var(--color-dark);
+    left: 1rem;
+}
+main{
+    margin-top: 1.4rem;
+
+}
+main .date{
+    display:inline-block;
+    background: var(--color-light);
+    border-radius: var(--border-radius-1);
+    margin-top: 1rem;
+    padding:0.5rem 1.6rem;
+
+}
+main .date input{
+    background: transparent;
+    color:var(--color-dark);
+}
+
+
+/* Media Queries */
+
+@media screen and (max-width:1200px){
+    .container{
+        width: 94%;
+        grid-template-columns: 7rem auto 23;
+
+    }
+    aside .sidebar h3{
+        display: none;
+    }
+    aside .sidebar a{
+        width: 5.6rem;
+    }
+    aside .sidebar a:last-child{
+        position: relative;
+        margin-top: 1.8rem;
+    }
+}
+
+@media screen and (max-width:768px){
+    .container{
+        width: 100%;
+        grid-template-columns: 1fr;
+    }
+    aside{
+        position: fixed;
+        left: -100%;
+        background: var(--color-white);
+        width: 18rem;
+        z-index: 3;
+        box-shadow: 1rem 3rem 4rem var(--color-light);
+        height: 100vh;
+        padding-right: var(--card-padding);
+        display: none;
+        animation: showMenu 300ms ease forwards;
+    }
+    @keyframes showMenu{
+        to{
+            left:0;
+        }
+
+    }
+    aside .logo{
+        margin-left: 1rem;
+    }
+    aside .logo h2{
+        display: inline;
+    }
+    aside .sidebar h3{
+        display: inline;
+    }
+    aside .sidebar a{
+        width: 100%;
+        height: 3.4rem;
+    }
+    aside .sidebar a:last-child{
+        position: absolute;
+        bottom: 5rem;
+    }
+    aside .close{
+        display: inline-block;
+        cursor: pointer;
+    }
+    
+    .top-nav {
+        left: 0;
+        right: 0;
+        width: inherit;
+        border-radius: 0;
+    }
+    
+    .top-nav .theme-toggler {
+        margin-right: 0.5rem;
+    }
+    .top-nav .b1 button{
+        display: inline-block;
+        background:transparent;
+        cursor: pointer;
+        color: var(--color-dark);
+        left: 1rem;
+    
+    }
+    .top-nav .b1 span{
+        font-size: 2rem;
+    }
+}
+
+
+    </style>
 </head>
 
 <body data-theme="light">
@@ -46,41 +313,41 @@
             <div class="sidebar">
                 <a href="{% url 'admin_dashboard' %}" class="{% if  request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}" data-active="dash" id="dash">
                     <span class="material-icons-sharp">
-                        grid_view
-                        <!-- <img src="{% static 'images/dash.svg' %}" alt="" class="svg-icon"> -->
+                        <!-- grid_view -->
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M520-600v-240h320v240H520ZM120-440v-400h320v400H120Zm400 320v-400h320v400H520Zm-400 0v-240h320v240H120Zm80-400h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z"/></svg>
                     </span>
                     <h3>Dashboard</h3>
                 </a>
                 <a href="{% url 'view_complains' %}" class="{% if request.resolver_match.url_name == 'view_complains' or request.resolver_match.url_name == 'add_complain' or request.resolver_match.url_name == 'edit_complain' %}active{% endif %}" data-active="manage-complaints" id="complain">
                     <span class="material-icons-sharp">
-                        person_outline
-                    </span>
+                        <!-- person_outline -->
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/></svg>                    </span>
                     <h3>Complaints</h3>
                 </a>
                 <a href="{% url 'view_fir' %}" class="{% if  request.resolver_match.url_name == 'view_fir' or request.resolver_match.url_name == 'add_fir' or request.resolver_match.url_name == 'edit_fir' %}active{% endif %}" data-active="manage-fir" id="fir">
                     <span class="material-icons-sharp">
-                        receipt_long
-                    </span>
+                        <!-- receipt_long -->
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M240-80q-50 0-85-35t-35-85v-120h120v-560l60 60 60-60 60 60 60-60 60 60 60-60 60 60 60-60 60 60 60-60v680q0 50-35 85t-85 35H240Zm480-80q17 0 28.5-11.5T760-200v-560H320v440h360v120q0 17 11.5 28.5T720-160ZM360-600v-80h240v80H360Zm0 120v-80h240v80H360Zm320-120q-17 0-28.5-11.5T640-640q0-17 11.5-28.5T680-680q17 0 28.5 11.5T720-640q0 17-11.5 28.5T680-600Zm0 120q-17 0-28.5-11.5T640-520q0-17 11.5-28.5T680-560q17 0 28.5 11.5T720-520q0 17-11.5 28.5T680-480ZM240-160h360v-80H200v40q0 17 11.5 28.5T240-160Zm-40 0v-80 80Z"/></svg>                    </span>
                     <h3>FIRs</h3>
                 </a>
                 {% if is_superuser %}
                 <a href="{% url 'login_activity' %}" class="{% if  request.resolver_match.url_name == 'login_activity' %}active{% endif %}" data-active="manage-log" id="log">
                     <span class="material-icons-sharp">
-                        manage_accounts
-                    </span>
+                        <!-- manage_accounts -->
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M80-600v-160q0-33 23.5-56.5T160-840h640q33 0 56.5 23.5T880-760v160h-80v-160H160v160H80Zm80 360q-33 0-56.5-23.5T80-320v-200h80v200h640v-200h80v200q0 33-23.5 56.5T800-240H160ZM40-120v-80h880v80H40Zm440-420ZM80-520v-80h240q11 0 21 6t15 16l47 93 123-215q5-9 14-14.5t20-5.5q11 0 21 5.5t15 16.5l49 98h235v80H620q-11 0-21-5.5T584-542l-26-53-123 215q-5 10-15 15t-21 5q-11 0-20.5-6T364-382l-69-138H80Z"/></svg>                    </span>
                     <h3>Login Activity</h3>
                 </a>
                 <a href="{% url 'user_list' %}" class="{% if  request.resolver_match.url_name == 'user_list' or request.resolver_match.url_name == 'user_create' or request.resolver_match.url_name == 'user_update' or request.resolver_match.url_name == 'user_delete'%}active{% endif %}" id="manage" data-active="manage-users">
                     <span class="material-icons-sharp">
-                        supervisor_account
-                    </span>
+                        <!-- supervisor_account -->
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M680-360q-42 0-71-29t-29-71q0-42 29-71t71-29q42 0 71 29t29 71q0 42-29 71t-71 29ZM480-160v-56q0-24 12.5-44.5T528-290q36-15 74.5-22.5T680-320q39 0 77.5 7.5T832-290q23 9 35.5 29.5T880-216v56H480Zm-80-320q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47Zm0-160ZM80-160v-112q0-34 17-62.5t47-43.5q60-30 124.5-46T400-440q35 0 70 6t70 14l-34 34-34 34q-18-5-36-6.5t-36-1.5q-58 0-113.5 14T180-306q-10 5-15 14t-5 20v32h240v80H80Zm320-80Zm0-320q33 0 56.5-23.5T480-640q0-33-23.5-56.5T400-720q-33 0-56.5 23.5T320-640q0 33 23.5 56.5T400-560Z"/></svg>                    </span>
                     <h3>Manage Users</h3>
                 </a>
                 {% endif %}
                 <a href="{% url 'logout-admin' %}">
                     <span class="material-icons-sharp">
-                        logout
-                    </span>
+                        <!-- logout -->
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/></svg>                    </span>
                     <h3>Logout</h3>
                 </a>
             </div>

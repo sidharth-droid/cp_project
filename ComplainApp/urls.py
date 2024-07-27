@@ -38,8 +38,5 @@ urlpatterns = [
     path('admin/activity/',views.login_activity,name='login_activity'),
     path('admin/activity/<int:activity_id>/delete/',views.delete_login_activity,name='delete_login_activity'),
     path('admin/logout/',views.logout_handle,name='logout-admin'),
-    path('admin/session_invalidated/', views.session_invalidated, name='session_invalidated'),
-
-    
    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

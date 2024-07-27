@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 
+# Allow only particular domain to access the API
 class CheckAllowedOriginMixin:
     ALLOWED_ORIGINS = [
         "https://onlinecomplain.subrat.xyz", 

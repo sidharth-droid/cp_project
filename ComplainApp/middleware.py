@@ -1,12 +1,7 @@
 # middleware.py
 from django.contrib.sessions.models import Session
-from django.utils.deprecation import MiddlewareMixin
-from django.contrib.auth import logout
 from django.utils import timezone
-from django.contrib.auth.models import User
-from .models import Profile,AdminActivity
-from django.urls import reverse
-from django.shortcuts import redirect
+from .models import Profile
 
 class SingleSessionMiddleware:
     def __init__(self, get_response):
@@ -35,10 +30,3 @@ class SingleSessionMiddleware:
     def is_session_valid(self, request):
         """Check if the session key is in the user's profile session keys."""
         return request.session.session_key in request.user.profile.session_keys
-
-
-
-# --------------Unused------------------
-# after profile.save()
-    # if not self.is_session_valid(request):
-                #     return redirect(reverse('session_invalidated'))

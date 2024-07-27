@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 import string
 from django.utils.crypto import get_random_string
 from django.utils import timezone
-from django.db.models import Sum, Count
 import random,hashlib
 
 class Complains(models.Model):
@@ -47,19 +46,7 @@ class Complains(models.Model):
             self.close_date = None
 
         super(Complains, self).save(*args, **kwargs)
-    @classmethod
-    def get_statistics(cls):
-        total_complaints = cls.objects.count()
-        total_closed_complaints = cls.objects.filter(status='closed').count()
-        total_fraud_amount = cls.objects.aggregate(Sum('fraudlent_amount'))['fraudlent_amount__sum'] or 0
-        total_amount_recovered = cls.objects.aggregate(Sum('amount_recovered'))['amount_recovered__sum'] or 0
 
-        return {
-            'total_complaints': total_complaints,
-            'total_closed_complaints': total_closed_complaints,
-            'total_fraud_amount': total_fraud_amount,
-            'total_amount_recovered': total_amount_recovered,
-        }
 
 class FIR(models.Model):
     complain = models.ManyToManyField(Complains,related_name='firs')

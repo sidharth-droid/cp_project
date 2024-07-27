@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
 :root {
-    /* --color-primary: #7380ec; */
     --color-primary: #be58dd;
     --color-danger: #ff7782;
     --color-success: #41f1b6;
@@ -14,6 +13,7 @@
     --color-primary-variant: #111e88;
     --color-dark-variant: #677483;
     --color-background: #f6f6f9;
+    --color-icon: #7d8da1;
     --card-border-radius: 2rem;
     --border-radius-1: 0.4rem;
     --border-radius-2: 0.8rem;
@@ -29,6 +29,7 @@
     --color-dark:#edeffd;
     --color-dark-variant:#a3bdcc;
     --color-light: rgba(0, 0, 0, 0.4);
+    --color-icon: #edeffd;
     --box-shadow: 0 2rem 3rem var(--color-light);
 }
 
@@ -129,196 +130,6 @@ b{
     color: var(--color-warning);
 }
 
-/* .svg-icon{
-    color: "#677483";
-} */
-aside{
-    height: 100vh;
-    top: 5rem;
-   
-    /* background: gray; */
-}
-aside .top{
-    /* background: white; */
-    display: flex;
-    align-items:center;
-    justify-content: space-between;
-    margin-top: 1.4rem;
-}
-aside .logo{
-    display: flex;
-    gap:0.8rem
-}
-aside .logo img{
-    width: 2rem;
-    height: 2rem;
-}
-aside .close{
-    display: none;
-}
-
-aside.sidebar{
-    background: white;
-    display: flex;
-    flex-direction: column;
-    height:86vh;
-    position: relative;
-    top:3rem;
-}
-aside h3{
-    font-weight: 500;
-
-}
-
-aside .sidebar a{
-    display:flex;
-    color: var(--color-info-dark);
-    margin-left: 2rem;
-    gap:1rem;
-    align-items:center;
-    position: relative;
-    height: 3.7rem;
-    transition: all 300ms ease;
-
-}
-
-aside .sidebar a span{
-    font-size: 1.6rem;
-    transition: all 300ms ease;
-}
-aside .sidebar a:last-child{
-    position: absolute;
-    bottom: 2rem;
-    width: 10%;
-}
-aside .sidebar a.active{
-    background: var(--color-light);
-    color:var(--color-primary);
-    margin-left: 0;
-}
-
-aside .sidebar a.active:before{
-    content: "";
-    width:6px;
-    height: 100%;
-    background: var(--color-primary);
-}
-
-aside .sidebar a.active span{
-    color: var(--color-primary);
-    margin-left: calc(1rem - 3px);
-
-}
-
-aside .sidebar a:hover{
-    color: var(--color-primary);
-    
-}
-
-aside .sidebar a:hover span{
-    margin-left: 1rem;
-}
-
-
-.theme-toggler{
-    background: var(--color-light);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 1.9rem;
-    width: 5.2rem;
-    cursor: pointer;
-    border-radius: var(--border-radius-1);
-}
-
-.theme-toggler span{
-    font-size: 1.2rem;
-    width: 50%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.theme-toggler span.active{
-    background: var(--color-primary);
-    color: white;
-    border-radius: var(--border-radius-1);
-}
-
-.top-nav {
-    display: flex;
-    justify-content:space-between;
-    align-items: center;
-    background-color: var(--color-background);
-    padding: 0.5rem 1rem;
-    position: fixed;
-    width: auto;
-    right: 1rem;
-    top: 1rem;
-    /* left: 0; */
-    z-index: 10;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 1rem;
-    height: 50px;
-}
-
-.top-nav .theme-toggler {
-    display: flex;
-    align-items: center;
-    gap: 0rem;
-    margin-right: 2rem;
-}
-
-.top-nav .theme-toggler span {
-    cursor: pointer;
-    font-size: 1.5rem;
-    margin-left: 1rem;
-}
-
-.top-nav .profile .info {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    margin-right: 1rem;
-}
-
-.top-nav .profile .info p {
-    margin: 0;
-    
-}
-
-.top-nav .profile .info small {
-    color: var(--color-info-dark);
-}
-
-.top-nav .b1 button{
-    display: none;
-    background:transparent;
-    cursor: pointer;
-    color: var(--color-dark);
-    left: 1rem;
-}
-main{
-    margin-top: 1.4rem;
-
-}
-main .date{
-    display:inline-block;
-    background: var(--color-light);
-    border-radius: var(--border-radius-1);
-    margin-top: 1rem;
-    padding:0.5rem 1.6rem;
-
-}
-main .date input{
-    background: transparent;
-    color:var(--color-dark);
-}
-
-
-/* Media Queries */
-
 @media screen and (max-width:1200px){
     .container{
         width: 94%;
@@ -361,7 +172,6 @@ main .date input{
 
     }
     aside .logo{
-        /* margin-left: 1rem; */
         margin-left: 1rem;
     }
     aside .logo h2{
@@ -391,10 +201,9 @@ main .date input{
     }
     
     .top-nav .theme-toggler {
-        margin-right: 0.5rem; /* Adjust space between theme toggler and welcome message */
+        margin-right: 0.5rem;
     }
     .top-nav .b1 button{
-        /* display: inline-block; */
         display: inline-block;
         background:transparent;
         cursor: pointer;

@@ -51,29 +51,3 @@ admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.unregister(Group)
 admin.site.register(Group, GroupAdmin)
-
-
-
-
-
-
-# --------------Unused Admin--------------
-
-# @admin.register(ScamPhone)
-# class ScamPhoneAdmin(admin.ModelAdmin):
-#     list_display = ('number','status','details','complaints','created_at')
-#     list_filter = ('status','complaints')
-#     search_fields = ('number',)
-# @admin.register(ScamLink)
-# class ScamLinkAdmin(admin.ModelAdmin):
-#     list_display = ('url','status','details','complaints','created_at')
-#     list_filter = ('status','complaints')
-#     search_fields = ('url',)
-# @admin.register(ScamEmail)
-# class ScamEmailAdmin(admin.ModelAdmin):
-#     list_display = ('email','status','details','complaints','created_at')
-#     list_filter = ('status','complaints')
-#     search_fields = ('email',)
- # ('Files', {
-        #     # 'fields': ('images_videos',)
-        # }),
