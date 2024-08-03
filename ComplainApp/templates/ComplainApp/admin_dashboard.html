@@ -256,6 +256,7 @@
     <div>
         <label for="time_range">Time Range:</label>
         <select id="time_range" name="time_range">
+            <option value="daily" {% if time_range == 'daily' %}selected{% endif %}>Daily</option>
             <option value="monthly" {% if time_range == 'monthly' %}selected{% endif %}>Monthly</option>
             <option value="weekly" {% if time_range == 'weekly' %}selected{% endif %}>Weekly</option>
             <option value="yearly" {% if time_range == 'yearly' %}selected{% endif %}>Yearly</option>

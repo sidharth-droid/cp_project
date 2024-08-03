@@ -30,7 +30,7 @@ import hashlib,os
 import json
 from openpyxl import Workbook
 from io import BytesIO
-from django.db.models.functions import TruncMonth,TruncYear,TruncWeek,Lower
+from django.db.models.functions import TruncMonth,TruncYear,TruncWeek,Lower,TruncDay
 from django import forms
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
@@ -224,7 +224,7 @@ def AdminDashboard(request):
         return redirect('verify_otp')
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
-    time_range = request.GET.get('time_range', 'monthly')
+    time_range = request.GET.get('time_range', 'daily')
 
     if start_date and end_date:
         try:
@@ -269,13 +269,20 @@ def AdminDashboard(request):
             'registered_data': [entry['count'] for entry in yearly_complaints],
             'closed_data': [Complains.objects.filter(close_date__year=entry['year'].year, status='closed').count() for entry in yearly_complaints]
         }
-    else:
+    elif time_range=='monthly':
         # Get the monthly data (default)
         monthly_complaints = Complains.objects.annotate(month=TruncMonth('Date')).values('month').annotate(count=Count('pk'))
         chart_data = {
             'labels': [entry['month'].strftime('%Y-%m') for entry in monthly_complaints],
             'registered_data': [entry['count'] for entry in monthly_complaints],
             'closed_data': [Complains.objects.filter(close_date__month=entry['month'].month, status='closed').count() for entry in monthly_complaints]
+        }
+    else:
+        daily_complaints = Complains.objects.annotate(day=TruncDay('Date')).values('day').annotate(count=Count('pk'))
+        chart_data={
+            'labels':[entry['day'].strftime('%Y-%m-%d') for entry in daily_complaints],
+            'registered_data':[entry['count'] for entry in daily_complaints],
+            'closed_data':[Complains.objects.filter(close_date__day=entry['day'].day,status='closed').count() for entry in daily_complaints] 
         }
 
     all_statuses = ['open', 'in review', 'visit ps', 'in progress', 'closed']
@@ -450,6 +457,8 @@ def complain_create_view(request):
                 response.raise_for_status()
             except requests.exceptions.RequestException as e:
                 print("Issue with submitting to API: ",e)
+                messages.success(request, f'Your complaint has been successfully submitted. Your acknowledgment number is {complain.ack_number}.')
+
             messages.success(request, f'Your complaint has been successfully submitted. Your acknowledgment number is {complain.ack_number}.')
             return redirect('add_complain')
         else:
