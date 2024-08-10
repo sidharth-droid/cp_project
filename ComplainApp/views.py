@@ -452,12 +452,12 @@ def complain_create_view(request):
             }
             api_data = json.dumps(api_data)
             print(api_data)
-            try:
-                response = requests.post('https://backendcp.subrat.xyz/v1/api/enquire/save', data=api_data,headers={'Content-Type': 'application/json'})
-                response.raise_for_status()
-            except requests.exceptions.RequestException as e:
-                print("Issue with submitting to API: ",e)
-                messages.success(request, f'Your complaint has been successfully submitted. Your acknowledgment number is {complain.ack_number}.')
+            # try:
+            #     response = requests.post('https://backendcp.subrat.xyz/v1/api/enquire/save', data=api_data,headers={'Content-Type': 'application/json'})
+            #     response.raise_for_status()
+            # except requests.exceptions.RequestException as e:
+            #     print("Issue with submitting to API: ",e)
+            #     messages.success(request, f'Your complaint has been successfully submitted. Your acknowledgment number is {complain.ack_number}.')
 
             messages.success(request, f'Your complaint has been successfully submitted. Your acknowledgment number is {complain.ack_number}.')
             return redirect('add_complain')
