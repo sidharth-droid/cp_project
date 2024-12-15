@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'CP_Odisha.wsgi.application'
 
 
 DATABASES = {
-    'default':dj_database_url.parse("postgresql://cpdb_jete_user:5VvCxT37JLqyMwTr44FMfhaByDvihrOL@dpg-cr6our23esus73cjtbi0-a.oregon-postgres.render.com/cpdb_jete")
+    'default':dj_database_url.parse("postgresql://cp_database_x5fs_user:dNRG2W2b0w1es91zoMwzTCZUhsYiFMWJ@dpg-ctfbaatds78s73doce60-a.oregon-postgres.render.com/cp_database_x5fs")
 }
 
 # Password validation
